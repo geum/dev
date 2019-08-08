@@ -1,10 +1,10 @@
-const DataRegistry = require('./DataRegistry');
+const Registry = require('./Registry');
 
 /**
  * Model abstract used as a starting point
  * to implement ModelInterface
  */
-class DataModel extends DataRegistry {
+class Model extends Registry {
   /**
    * Model Loader
    *
@@ -14,7 +14,7 @@ class DataModel extends DataRegistry {
    * @return {StoreModel}
    */
   static load(data = {}) {
-    return new DataModel(data);
+    return new Model(data);
   }
 
   /**
@@ -44,4 +44,4 @@ class DataModel extends DataRegistry {
 }
 
 //adapter
-module.exports = DataModel;
+module.exports = Model;

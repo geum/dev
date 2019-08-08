@@ -1,4 +1,4 @@
-const EventEmitter = require('./event/EventEmitter');
+const EventEmitter = require('./EventEmitter');
 
 class Framework extends EventEmitter {
   /**

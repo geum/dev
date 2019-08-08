@@ -4,73 +4,64 @@
 $ npm i --save @geum/core
 ```
 
-## Usage
+## EventEmitter Usage
 
 ```js
-//app.js
-const http = require('http');
-const { HttpServer } = require('@geum/core');
+const { EventEmitter, Helper } = require('@geum/core');
 
-const app = HttpServer.load();
+const emitter = EventEmitter.load();
 
-//make some routes
-app.route('/some/path').post((req, res) => {
-  res.content.set('Hello from /some/path');
+emitter.on('trigger something', async x => {
+  console.log('something triggered', x + 1);
 });
 
-app.post('/some/path', (req, res) => {
-  res.content.set('Hello again from /some/path');
-});
+emitter.on(/trigger (something)/, async x => {
+  await Helper.sleep(2000);
+  console.log('(something) triggered', x + 2);
+}, 2);
 
-app.post('/:category/:name', (req, res) => {
-  res.rest.setError(true, 'Something went wrong');
-  res.content.set('Hello :name from /some/path');
-});
-
-//default
-const server = http.createServer(app.process);
-
-//initialze the app
-app.initialize();
-
-//listen to server
-server.listen(3000);
+await emitter.trigger('trigger something', 1);
 ```
 
-### Defining Routes in a separate file
+## TaskQueue Usage
 
 ```js
-// controller.js
-const { HttpRouter } = require('@geum/core');
+const { TaskQueue, Helper } = require('@geum/core');
 
-const router = module.exports = HttpRouter.load();
+const queue = TaskQueue.load();
 
-router.post('/some/path', (req, res) => {
-  res.content.set('Hello again from /some/path');
-});
+queue.push(async x => {
+  console.log(x + 1);
+})
 
-router.post('/:category/:name', (req, res) => {
-  res.rest.setError(true, 'Something went wrong');
-  res.content.set('Hello :name from /some/path');
-});
+queue.shift(async x => {
+  await Helper.sleep(2000);
+  console.log(x + 2);
+})
 
-//...
-// app.js
+queue.add(async x => {
+  console.log(x + 3);
+}, 10);
 
-const http = require('http');
-const { HttpServer } = require('@geum/core');
-const controller = require('./controller')
+await queue.run(1);
+```
 
-const app = HttpServer.load();
+## Registry Usage
 
-app.use(controller);
+```js
+const { Registry } = require('@geum/core');
 
-//default
-const server = http.createServer(app.process);
+const registry = Registry.load();
 
-//initialze the app
-app.initialize();
+registry.set('foo', 'bar', 'zoo');
+registry.set('foo', 'zoo', ['foo', 'bar', 'zoo']);
 
-//listen to server
-server.listen(3000);
+console.log(registry.has('foo', 'bar'));
+console.log(registry.has('bar', 'foo'));
+console.log(registry.get('foo', 'zoo', 1));
+
+registry.remove('foo', 'bar');
+
+console.log(registry.has('foo', 'bar'));
+console.log(registry.has('foo', 'zoo'));
 ```

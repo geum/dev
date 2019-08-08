@@ -1,7 +1,7 @@
-const DataRegistry = require('../src/data/DataRegistry');
+const { Registry } = require('../src');
 
 test('Registry set/has/remove/get', () => {
-  const registry = DataRegistry
+  const registry = Registry
     .load()
     .set('foo', 'bar', 'zoo')
     .set('foo', 'zoo', ['foo', 'bar', 'zoo']);
@@ -16,7 +16,7 @@ test('Registry set/has/remove/get', () => {
 });
 
 test('Registry each', () => {
-  const registry = DataRegistry
+  const registry = Registry
     .load()
     .set('foo', 'bar', 'zoo')
     .set('foo', 'zoo', ['foo', 'bar', 'zoo']);

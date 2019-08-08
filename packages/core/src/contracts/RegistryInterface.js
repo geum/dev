@@ -1,4 +1,4 @@
-const DataException = require('../DataException');
+const Exception = require('../Exception');
 
 /**
  * Registry contract
@@ -12,7 +12,7 @@ class RegistryInterface {
    * @return {*}
    */
   get(...path) {
-    throw DataException.forUndefinedAbstract('get');
+    throw Exception.forUndefinedAbstract('get');
   }
 
   /**
@@ -23,7 +23,7 @@ class RegistryInterface {
    * @return {Boolean}
    */
   has(...path) {
-    throw DataException.forUndefinedAbstract('has');
+    throw Exception.forUndefinedAbstract('has');
   }
 
   /**
@@ -34,7 +34,7 @@ class RegistryInterface {
    * @return {RegistryInterface}
    */
   remove(...path) {
-    throw DataException.forUndefinedAbstract('remove');
+    throw Exception.forUndefinedAbstract('remove');
   }
 
   /**
@@ -46,7 +46,7 @@ class RegistryInterface {
    * @return {RegistryInterface}
    */
   set(...path) {
-    throw DataException.forUndefinedAbstract('set');
+    throw Exception.forUndefinedAbstract('set');
   }
 }
 

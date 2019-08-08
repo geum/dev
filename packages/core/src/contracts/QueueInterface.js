@@ -1,4 +1,4 @@
-const QueueException = require('../QueueException');
+const Exception = require('../Exception');
 
 /**
  * Queue contract
@@ -13,7 +13,7 @@ class QueueInterface {
    * @return {TaskQueue}
    */
   add(callback, priority = 0) {
-    throw QueueException.forUndefinedAbstract('add');
+    throw Exception.forUndefinedAbstract('add');
   }
 
   /**
@@ -24,7 +24,7 @@ class QueueInterface {
    * @return {Integer}
    */
   async run(...args) {
-    throw QueueException.forUndefinedAbstract('run');
+    throw Exception.forUndefinedAbstract('run');
   }
 }
 

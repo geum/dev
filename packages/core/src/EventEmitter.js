@@ -1,5 +1,5 @@
-const Definition = require('../Definition');
-const { TaskQueue } = require('../queue');
+const Definition = require('./Definition');
+const TaskQueue = require('./TaskQueue');
 
 const EventInterface = require('./contracts/EventInterface');
 

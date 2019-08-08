@@ -1,4 +1,4 @@
-const Definition = require('../Definition');
+const Definition = require('./Definition');
 const QueueInterface = require('./contracts/QueueInterface');
 
 class TaskQueue {

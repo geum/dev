@@ -1,4 +1,4 @@
-const EventEmitter = require('../src/event/EventEmitter');
+const { EventEmitter } = require('../src');
 
 test('event on', async () => {
   const emitter = EventEmitter.load();

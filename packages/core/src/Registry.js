@@ -1,22 +1,21 @@
-const Definition = require('../Definition');
+const Definition = require('./Definition');
 const RegistryInterface = require('./contracts/RegistryInterface');
-const DotNotationTrait = require('./registry/DotNotationTrait');
 
 /**
  * Registry are designed to easily manipulate data in
  * preparation to integrate with any multi dimensional
  * data store.
  */
-class DataRegistry {
+class Registry {
   /**
    * Registry Loader
    *
    * @param {Object} [data = {}]
    *
-   * @return {DataRegistry}
+   * @return {Registry}
    */
   static load(data = {}) {
-    return new DataRegistry(data);
+    return new Registry(data);
   }
 
   /**
@@ -33,7 +32,7 @@ class DataRegistry {
    *
    * @param {(...String)} [path]
    *
-   * @return {DataRegistry}
+   * @return {Registry}
    */
   each(...path) {
     const callback = path.pop();
@@ -91,6 +90,19 @@ class DataRegistry {
   }
 
   /**
+   * Gets a value given the path in the registry.
+   *
+   * @param {String} notation  Name space string notation
+   * @param {String} [separator = '.'] If you want to specify a different separator other than dot
+   *
+   * @return mixed
+   */
+  getDot(notation, separator = '.') {
+    const path = notation.split(separator)
+    return this.get(...path);
+  }
+
+  /**
    * Returns true if the specified path exists
    *
    * @param {(...String)} [path]
@@ -123,11 +135,24 @@ class DataRegistry {
   }
 
   /**
+   * Checks to see if a key is set
+   *
+   * @param {String} notation  Name space string notation
+   * @param {String} [separator = '.'] If you want to specify a different separator other than dot
+   *
+   * @return {Boolean}
+   */
+  hasDot(notation, separator = '.') {
+    const path = notation.split(separator)
+    return this.has(...path);
+  }
+
+  /**
    * Removes the data from a specified path
    *
    * @param {(...String)} [path]
    *
-   * @return {DataRegistry}
+   * @return {Registry}
    */
   remove(...path) {
     if (!path.length) {
@@ -151,12 +176,25 @@ class DataRegistry {
   }
 
   /**
+   * Removes name space given notation
+   *
+   * @param {String} notation  Name space string notation
+   * @param {String} [separator = '.'] If you want to specify a different separator other than dot
+   *
+   * @return {DotNotationTrait}
+   */
+  removeDot(notation, separator = '.') {
+    const path = notation.split(separator)
+    return this.remove(...path);
+  }
+
+  /**
    * Sets the data of a specified path
    *
    * @param {(...String)} [path]
    * @param {*} value
    *
-   * @return {DataRegistry}
+   * @return {Registry}
    */
   set(...path) {
     if (path.length < 1) {
@@ -187,10 +225,25 @@ class DataRegistry {
 
     return this;
   }
+
+  /**
+   * Creates the name space given the space
+   * and sets the value to that name space
+   *
+   * @param {String} notation Name space string notation
+   * @param {*} value Value to set on this namespace
+   * @param {String} [separator = '.'] If you want to specify a different separator other than dot
+   *
+   * @return {DotNotationTrait}
+   */
+  setDot(notation, value, separator = '.') {
+    const path = notation.split(separator)
+    return this.set(...path, value);
+  }
 }
 
 //definition check
-Definition(DataRegistry).uses(DotNotationTrait).implements(RegistryInterface);
+Definition(Registry).implements(RegistryInterface);
 
 //adapter
-module.exports = DataRegistry;
+module.exports = Registry;

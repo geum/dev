@@ -1,4 +1,4 @@
-const EventException = require('../EventException');
+const Exception = require('../Exception');
 
 /**
  * Event contract
@@ -14,7 +14,7 @@ class EventInterface {
    * @return {EventEmitter}
    */
   on(event, callback, priority = 0) {
-    throw EventException.forUndefinedAbstract('on');
+    throw Exception.forUndefinedAbstract('on');
   }
 
   /**
@@ -26,7 +26,7 @@ class EventInterface {
    * @return {EventEmitter}
    */
   async emit(event, ...args) {
-    throw EventException.forUndefinedAbstract('emit');
+    throw Exception.forUndefinedAbstract('emit');
   }
 }
 

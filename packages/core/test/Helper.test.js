@@ -1,6 +1,3 @@
-const Helper = require('../src/Helper');
+const { Helper } = require('../src');
 
-test('helper test', async() => {
-  //const results = Helper.parseQuery('foo=bar&zoo[bar]=foo&bar[]=zoo&bar[]=foo');
-  //console.log(results);
-});
+test('helper test', async() => {});

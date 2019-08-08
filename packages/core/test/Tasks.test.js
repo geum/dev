@@ -1,4 +1,4 @@
-const TaskQueue = require('../src/queue/TaskQueue');
+const { TaskQueue } = require('../src');
 
 test('task run test', async () => {
   const queue = TaskQueue.load();

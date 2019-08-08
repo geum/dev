@@ -1,79 +1,26 @@
-const {
-  CollectionInterface,
-  ModelInterface,
-  RegistryInterface,
-  SchemaInterface,
-  StoreInterface,
-  DataException,
-  DataModel,
-  DataRegistry,
-  MemoryStore,
-  StoreCollection,
-  StoreModel,
-  StoreSchema,
-  StoreSearch
-} = require('./data');
-
-const {
-  EventInterface,
-  EventEmitter,
-  EventException
-} = require('./event');
-
-const {
-  QueueInterface,
-  TaskQueue,
-  QueueException
-} = require('./queue');
-
-const {
-  RouteInterface,
-  RouterInterface,
-  ServerInterface,
-  HttpException,
-  HttpRoute,
-  HttpRouter,
-  HttpServer
-} = require('./http');
+const EventInterface = require('./contracts/EventInterface');
+const QueueInterface = require('./contracts/QueueInterface');
+const RegistryInterface = require('./contracts/RegistryInterface');
 
 const Definition = require('./Definition');
+const EventEmitter = require('./EventEmitter');
 const Exception = require('./Exception');
 const Framework = require('./Framework');
 const Helper = require('./Helper');
+const Model = require('./Model');
+const Registry = require('./Registry');
+const TaskQueue = require('./TaskQueue');
 
 module.exports = {
-  CollectionInterface,
-  ModelInterface,
-  RegistryInterface,
-  SchemaInterface,
-  StoreInterface,
-  DataException,
-  DataModel,
-  DataRegistry,
-  MemoryStore,
-  StoreCollection,
-  StoreModel,
-  StoreSchema,
-  StoreSearch,
-
   EventInterface,
-  EventEmitter,
-  EventException,
-
   QueueInterface,
-  TaskQueue,
-  QueueException,
-
-  RouteInterface,
-  RouterInterface,
-  ServerInterface,
-  HttpException,
-  HttpRoute,
-  HttpRouter,
-  HttpServer,
-
+  RegistryInterface,
   Definition,
+  EventEmitter,
   Exception,
   Framework,
-  Helper
-}
+  Helper,
+  Model,
+  Registry,
+  TaskQueue
+};
