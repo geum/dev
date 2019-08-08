@@ -107,15 +107,26 @@ class Framework extends EventEmitter {
         return;
       }
 
-      //if a callback is not a function
-      if (typeof callback !== 'function') {
-        return;
-      }
-
       //determine the priority
       let priority = 0;
       if (typeof callbacks[index + 1] === 'number') {
         priority = callbacks[index + 1];
+      }
+
+      //if the callback is another framework
+      if (callback instanceof Framework) {
+        Object.keys(callback.listeners).forEach(event => {
+          this.on(event, (...args) => {
+            callback.emit(event, ...args);
+          }, priority);
+        });
+
+        return;
+      }
+
+      //if a callback is not a function
+      if (typeof callback !== 'function') {
+        return;
       }
 
       this.on('process', callback, priority);

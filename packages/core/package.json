@@ -1,14 +1,16 @@
 {
-  "name": "geum-core",
+  "name": "@geum/core",
   "version": "0.0.1",
   "description": "event driven core framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
-  "repository": "https://github.com/geum/core",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geum/core.git"
+  },
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "jest test/"
+    "test": "jest"
   },
   "devDependencies": {
     "jest": "^24.5.0",
@@ -17,5 +19,12 @@
   "dependencies": {
     "formidable": "^1.2.1",
     "querystrings": "^0.4.0"
+  },
+  "bugs": {
+    "url": "https://github.com/geum/core/issues"
+  },
+  "homepage": "https://github.com/geum/core#readme",
+  "directories": {
+    "test": "test"
   }
 }

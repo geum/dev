@@ -73,7 +73,7 @@ class HttpServer extends HttpRouter {
       response.statusCode = 500;
       response.statusMessage = HttpServer.STATUS_500;
 
-      status = (await this.emit('error', e, request, response)).meta;
+      status = (await this.emit('error', error, request, response)).meta;
     }
 
     //if the status was incomplete (308)
@@ -99,7 +99,7 @@ class HttpServer extends HttpRouter {
       response.statusCode = 500;
       response.statusMessage = HttpServer.STATUS_500;
 
-      status = (await this.emit('error', e, request, response)).meta;
+      status = (await this.emit('error', error, request, response)).meta;
     }
 
     //if the status was incomplete (308)
@@ -179,7 +179,7 @@ class HttpServer extends HttpRouter {
       response.statusCode = 500;
       response.statusMessage = HttpServer.STATUS_500;
 
-      status = (await this.emit('error', e, request, response)).meta;
+      status = (await this.emit('error', error, request, response)).meta;
     }
 
     //if the status was incomplete (308)

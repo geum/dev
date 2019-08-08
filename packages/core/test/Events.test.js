@@ -106,3 +106,19 @@ test('trigger unbind event', async () => {
   expect(triggered.length).toBe(0);
   expect(emitter.meta).toBe(EventEmitter.STATUS_NOT_FOUND);
 });
+
+test('event nesting', async () => {
+  const emitter = EventEmitter.load();
+
+  const actual = emitter.on('on something', async x => {
+    expect(emitter.meta.event).toBe('on something');
+    await emitter.emit('on something else', x + 1);
+    expect(emitter.meta).toBe(200);
+  });
+
+  emitter.on('on something else', x => {
+    expect(emitter.meta.event).toBe('on something else');
+  });
+
+  await emitter.emit('on something', 1);
+});

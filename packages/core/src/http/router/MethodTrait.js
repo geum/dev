@@ -6,7 +6,7 @@ const addMethod = (method) => {
   method = method.toLowerCase();
   //bind the method to the instance
   module.exports[method] = function(path, ...callbacks) {
-    this.route(path).method(method, ...callbacks)
+    this.route(path).method(method, ...callbacks);
   };
 };
 

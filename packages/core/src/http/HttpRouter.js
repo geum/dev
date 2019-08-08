@@ -36,12 +36,16 @@ class HttpRouter extends Framework {
    */
   use(path, ...callbacks) {
     //if path is a function
-    if (typeof path === 'function') {
+    if (typeof path === 'function' || path instanceof Framework) {
       return super.use(path, ...callbacks);
     }
 
-    //same as all method
-    this.all(path, ...callbacks);
+    if (typeof path === 'string' || path instanceof RegExp) {
+      //same as all method
+      this.all(path, ...callbacks);
+    }
+
+    return this;
   }
 }
 

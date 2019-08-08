@@ -62,6 +62,7 @@ class EventEmitter {
    * @return {EventEmitter}
    */
   async emit(event, ...args) {
+    this.meta = EventEmitter.STATUS_OK;
     const matches = this.match(event);
 
     //if there are no events found
@@ -89,7 +90,6 @@ class EventEmitter {
         queue.add(async (...args) => {
           //set the current
           this.meta = Object.assign({}, match, listener);
-
           //if this is the same event, call the method, if the method returns false
           if (await listener.callback(...args) === false) {
             return false;
