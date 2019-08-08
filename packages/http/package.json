@@ -1,0 +1,28 @@
+{
+  "name": "@geum/http",
+  "version": "0.0.1",
+  "description": "Event driven HTTP framework",
+  "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
+  "license": "MIT",
+  "homepage": "https://github.com/geum/http#readme",
+  "bugs": {
+    "url": "https://github.com/geum/http/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geum/http.git"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "@geum/core": "^0.0.3",
+    "formidable": "^1.2.1",
+    "querystrings": "^0.4.0"
+  },
+  "devDependencies": {
+    "jest": "^24.5.0",
+    "node-fetch": "^2.6.0"
+  }
+}
