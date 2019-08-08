@@ -19,6 +19,54 @@ class Registry {
   }
 
   /**
+   * Returns true if object keys is all numbers
+   *
+   * @param {Object} object
+   *
+   * @return {Boolean}
+   */
+  static shouldBeAnArray(object) {
+    if (!Object.keys(object).length) {
+      return false;
+    }
+
+    for (let key in object) {
+      if (isNaN(parseInt(key)) || String(key).indexOf('.') !== -1) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Transforms an object into an arra
+   *
+   * @param {Object} object
+   *
+   * @return {Array}
+   */
+  static makeArray(object) {
+    const array = [];
+    Object.keys(object).sort().forEach(function(key) {
+      array.push(object[key]);
+    });
+
+    return array;
+  }
+
+  /**
+   * Transforms an object into an arra
+   *
+   * @param {Array} array
+   *
+   * @return {Object}
+   */
+  static makeObject(array) {
+    return Object.assign({}, array);
+  }
+
+  /**
    * Sets the initial data
    *
    * @param {Object} [data = {}]
@@ -209,17 +257,58 @@ class Registry {
       return this;
     }
 
-    let value = path.pop();
-    const last = path.pop();
+    const value = path.pop();
+
+    let last = path.pop();
+    let prevData = null;
+    let prevStep = null;
     let pointer = this.data;
 
     path.forEach((step, i) => {
+      if (step === null || step === '') {
+        step = Object.keys(pointer).length;
+      }
+
+      if (prevData) {
+        if (!Array.isArray(pointer)
+          && Registry.shouldBeAnArray(pointer)
+        ) {
+          prevData[prevStep] = Registry.makeArray(pointer);
+          pointer = prevData[prevStep];
+        } else if (Array.isArray(pointer)
+          && !Registry.shouldBeAnArray(pointer)
+        ) {
+          prevData[prevStep] = Registry.makeObject(pointer);
+          pointer = prevData[prevStep];
+        }
+      }
+
       if (typeof pointer[step] !== 'object') {
         pointer[step] = {};
       }
 
+      prevStep = step;
+      prevData = pointer;
       pointer = pointer[step];
     });
+
+    if (last === null || last === '') {
+      last = Object.keys(pointer).length;
+    }
+
+    if (prevData) {
+      if (!Array.isArray(pointer)
+        && Registry.shouldBeAnArray(pointer)
+      ) {
+        prevData[prevStep] = Registry.makeArray(pointer);
+        pointer = prevData[prevStep];
+      } else if (Array.isArray(pointer)
+        && !Registry.shouldBeAnArray(pointer)
+      ) {
+        prevData[prevStep] = Registry.makeObject(pointer);
+        pointer = prevData[prevStep];
+      }
+    }
 
     pointer[last] = value;
 

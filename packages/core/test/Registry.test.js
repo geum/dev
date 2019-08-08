@@ -1,10 +1,9 @@
 const { Registry } = require('../src');
 
 test('Registry set/has/remove/get', () => {
-  const registry = Registry
-    .load()
-    .set('foo', 'bar', 'zoo')
-    .set('foo', 'zoo', ['foo', 'bar', 'zoo']);
+  const registry = Registry.load();
+  registry.set('foo', 'bar', 'zoo');
+  registry.set('foo', 'zoo', ['foo', 'bar', 'zoo']);
 
   expect(registry.has('foo', 'bar')).toBe(true);
   expect(registry.has('bar', 'foo')).toBe(false);
@@ -43,4 +42,4 @@ test('Registry each', () => {
   });
 
   expect(count).toBe(1);
-})
+});
