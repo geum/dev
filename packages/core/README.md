@@ -7,61 +7,91 @@ $ npm i --save @geum/core
 ## EventEmitter Usage
 
 ```js
-const { EventEmitter, Helper } = require('@geum/core');
+const { EventEmitter, Helper } = require('@geum/core')
 
-const emitter = EventEmitter.load();
+const emitter = EventEmitter.load()
 
 emitter.on('trigger something', async x => {
-  console.log('something triggered', x + 1);
-});
+  console.log('something triggered', x + 1)
+})
 
 emitter.on(/trigger (something)/, async x => {
-  await Helper.sleep(2000);
-  console.log('(something) triggered', x + 2);
-}, 2);
+  await Helper.sleep(2000)
+  console.log('(something) triggered', x + 2)
+}, 2)
 
-await emitter.trigger('trigger something', 1);
+await emitter.trigger('trigger something', 1)
 ```
 
 ## TaskQueue Usage
 
 ```js
-const { TaskQueue, Helper } = require('@geum/core');
+const { TaskQueue, Helper } = require('@geum/core')
 
-const queue = TaskQueue.load();
+const queue = TaskQueue.load()
 
 queue.push(async x => {
-  console.log(x + 1);
+  console.log(x + 1)
 })
 
 queue.shift(async x => {
-  await Helper.sleep(2000);
-  console.log(x + 2);
+  await Helper.sleep(2000)
+  console.log(x + 2)
 })
 
 queue.add(async x => {
-  console.log(x + 3);
-}, 10);
+  console.log(x + 3)
+}, 10)
 
-await queue.run(1);
+await queue.run(1)
 ```
 
 ## Registry Usage
 
 ```js
-const { Registry } = require('@geum/core');
+const { Registry } = require('@geum/core')
 
-const registry = Registry.load();
+const registry = Registry.load()
 
-registry.set('foo', 'bar', 'zoo');
-registry.set('foo', 'zoo', ['foo', 'bar', 'zoo']);
+registry.set('foo', 'bar', 'zoo')
+registry.set('foo', 'zoo', ['foo', 'bar', 'zoo'])
 
-console.log(registry.has('foo', 'bar'));
-console.log(registry.has('bar', 'foo'));
-console.log(registry.get('foo', 'zoo', 1));
+console.log(registry.has('foo', 'bar'))
+console.log(registry.has('bar', 'foo'))
+console.log(registry.get('foo', 'zoo', 1))
 
-registry.remove('foo', 'bar');
+registry.remove('foo', 'bar')
 
-console.log(registry.has('foo', 'bar'));
-console.log(registry.has('foo', 'zoo'));
+console.log(registry.has('foo', 'bar'))
+console.log(registry.has('foo', 'zoo'))
+```
+
+## Framework Usage
+
+```js
+
+const http = require('http')
+const { Framework } = require('@geum/core')
+
+const app = Framework.load()
+
+app.on('initialize', async() => {
+  console.log('I am initializing')
+})
+
+app.on('process', async(req, res) => {
+  console.log('i am processing')
+})
+
+app.run(async() => {
+  //create the server
+  const server = http.createServer(app.process)
+
+  //do something
+  //...
+
+  //listen to server
+  server.listen(3000)
+})
+
 ```
