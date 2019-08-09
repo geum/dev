@@ -114,7 +114,7 @@ class Framework extends EventEmitter {
       }
 
       //if the callback is another framework
-      if (callback instanceof Framework) {
+      if (callback instanceof EventEmitter) {
         Object.keys(callback.listeners).forEach(event => {
           this.on(event, (...args) => {
             callback.emit(event, ...args);

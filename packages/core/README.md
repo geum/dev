@@ -85,7 +85,7 @@ app.on('process', async(req, res) => {
 
 app.run(async() => {
   //create the server
-  const server = http.createServer(app.process)
+  const server = http.createServer(app.process.bind(app))
 
   //do something
   //...
