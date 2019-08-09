@@ -19,27 +19,6 @@ class Registry {
   }
 
   /**
-   * Returns true if object keys is all numbers
-   *
-   * @param {Object} object
-   *
-   * @return {Boolean}
-   */
-  static shouldBeAnArray(object) {
-    if (!Object.keys(object).length) {
-      return false;
-    }
-
-    for (let key in object) {
-      if (isNaN(parseInt(key)) || String(key).indexOf('.') !== -1) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
    * Transforms an object into an arra
    *
    * @param {Object} object
@@ -64,6 +43,31 @@ class Registry {
    */
   static makeObject(array) {
     return Object.assign({}, array);
+  }
+
+  /**
+   * Returns true if object keys is all numbers
+   *
+   * @param {Object} object
+   *
+   * @return {Boolean}
+   */
+  static shouldBeAnArray(object) {
+    if (typeof object !== 'object') {
+      return false;
+    }
+
+    if (!Object.keys(object).length) {
+      return false;
+    }
+
+    for (let key in object) {
+      if (isNaN(parseInt(key)) || String(key).indexOf('.') !== -1) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -258,37 +262,17 @@ class Registry {
     }
 
     const value = path.pop();
-
-    let last = path.pop();
-    let prevData = null;
-    let prevStep = null;
-    let pointer = this.data;
+    let last = path.pop(), pointer = this.data;
 
     path.forEach((step, i) => {
       if (step === null || step === '') {
-        step = Object.keys(pointer).length;
-      }
-
-      if (prevData) {
-        if (!Array.isArray(pointer)
-          && Registry.shouldBeAnArray(pointer)
-        ) {
-          prevData[prevStep] = Registry.makeArray(pointer);
-          pointer = prevData[prevStep];
-        } else if (Array.isArray(pointer)
-          && !Registry.shouldBeAnArray(pointer)
-        ) {
-          prevData[prevStep] = Registry.makeObject(pointer);
-          pointer = prevData[prevStep];
-        }
+        path[i] = step = Object.keys(pointer).length;
       }
 
       if (typeof pointer[step] !== 'object') {
         pointer[step] = {};
       }
 
-      prevStep = step;
-      prevData = pointer;
       pointer = pointer[step];
     });
 
@@ -296,21 +280,24 @@ class Registry {
       last = Object.keys(pointer).length;
     }
 
-    if (prevData) {
-      if (!Array.isArray(pointer)
-        && Registry.shouldBeAnArray(pointer)
-      ) {
-        prevData[prevStep] = Registry.makeArray(pointer);
-        pointer = prevData[prevStep];
-      } else if (Array.isArray(pointer)
-        && !Registry.shouldBeAnArray(pointer)
-      ) {
-        prevData[prevStep] = Registry.makeObject(pointer);
-        pointer = prevData[prevStep];
-      }
-    }
-
     pointer[last] = value;
+
+    //loop through the steps one more time fixing the objects
+    pointer = this.data;
+    path.forEach((step) => {
+      const next = pointer[step];
+      //if next is not an array and next should be an array
+      if (!Array.isArray(next) && Registry.shouldBeAnArray(next)) {
+        //transform next into an array
+        pointer[step] = Registry.makeArray(next);
+      //if next is an array and next should not be an array
+      } else if (Array.isArray(next) && !Registry.shouldBeAnArray(next)) {
+        //transform next into an object
+        pointer[step] = Registry.makeObject(next);
+      }
+
+      pointer = pointer[step];
+    });
 
     return this;
   }
@@ -326,7 +313,7 @@ class Registry {
    * @return {DotNotationTrait}
    */
   setDot(notation, value, separator = '.') {
-    const path = notation.split(separator)
+    const path = notation.split(separator);
     return this.set(...path, value);
   }
 }
