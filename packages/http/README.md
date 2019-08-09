@@ -7,55 +7,71 @@ $ npm i --save @geum/http
 ## Usage
 
 ```js
-//app.js
+//FILE: app.js
 const http = require('http');
 const { Application } = require('@geum/http');
 
 const app = Application.load();
 
-//make some routes
-app.route('/some/path').post((req, res) => {
-  res.content.set('Hello from /some/path');
+//... make some routes ...
+
+//Hello World
+app.get('/', (req, res) => {
+  res.content.set('Hello World');
 });
 
-app.post('/some/path', (req, res) => {
-  res.content.set('Hello again from /some/path');
+//Stage Test
+app.get('/rest/:category/search', (req, res) => {
+  res.rest.setError(false);
+  res.rest.setResults({ category: req.stage.get('category') });
 });
 
-app.post('/:category/:name', (req, res) => {
-  res.rest.setError(true, 'Something went wrong');
-  res.content.set('Hello :name from /some/path');
+//... listen to app events ...
+
+//track errors
+app.on('error', (e, req, res) => {
+  app.log(e);
+  res.setHeader('Content-Type', 'text/plain');
+  res.content.set(e.toString());
 });
 
-//default
-const server = http.createServer(app.process);
+//track logs
+app.on('log', (...args) => {
+  console.log(...args);
+});
 
-//initialze the app
-app.initialize();
+//... run it ...
 
-//listen to server
-server.listen(3000);
+app.run(() => {
+  //default
+  const server = http.createServer(app.process);
+
+  //listen to server
+  server.listen(3000);
+});
 ```
 
 ### Defining Routes in a separate file
 
 ```js
-// controller.js
+// FILE: controller.js
 const { Router } = require('@geum/http');
 
 const router = module.exports = HttpRouter.load();
 
-router.post('/some/path', (req, res) => {
-  res.content.set('Hello again from /some/path');
+//Hello World
+router.get('/', (req, res) => {
+  res.content.set('Hello World');
 });
 
-router.post('/:category/:name', (req, res) => {
-  res.rest.setError(true, 'Something went wrong');
-  res.content.set('Hello :name from /some/path');
+//Stage Test
+router.get('/rest/:category/search', (req, res) => {
+  res.rest.setError(false);
+  res.rest.setResults({ category: req.stage.get('category') });
 });
 
 //...
-// app.js
+// FILE: app.js
 
 const http = require('http');
 const { Application } = require('@geum/core');
@@ -63,14 +79,99 @@ const controller = require('./controller')
 
 const app = Application.load();
 
+//... add controllers ...
+
 app.use(controller);
 
-//default
-const server = http.createServer(app.process);
+//... run it ...
 
-//initialze the app
-app.initialize();
+app.run(() => {
+  //default
+  const server = http.createServer(app.process);
 
-//listen to server
-server.listen(3000);
+  //listen to server
+  server.listen(3000);
+});
+```
+
+### Using Middleware
+
+```js
+//FILE: app.js
+const http = require('http');
+const { Application } = require('@geum/http');
+
+const app = Application.load();
+
+//... middleware ...
+const cookie = require('cookie-parser')();
+const session = require('express-session')({
+  secret: 'keyboard cat',
+  cookie: { maxAge: 60000 },
+  resave: true,
+  saveUninitialized: true
+});
+
+//use cookie
+app.use((req, res) => {
+  //transform to async function
+  return new Promise(resolve => {
+    cookie(req, res, resolve)
+  });
+});
+
+//use session
+app.use((req, res) => {
+  //transform to async function
+  return new Promise(resolve => {
+    session(req, res, resolve)
+  });
+});
+
+//... make some routes ...
+
+//Hello World
+app.get('/', (req, res) => {
+  res.content.set('Hello World');
+});
+
+//Session Test
+app.route('/view').get((req, res) => {
+  if (!req.session.views) {
+    req.session.views = 0;
+  }
+
+  req.session.views++;
+  res.content.set(`Viewed ${req.session.views} times`);
+});
+
+//Stage Test
+app.get('/rest/:category/search', (req, res) => {
+  res.rest.setError(false);
+  res.rest.setResults({ category: req.stage.get('category') });
+});
+
+//... listen to app events ...
+
+//track errors
+app.on('error', (e, req, res) => {
+  app.log(e);
+  res.setHeader('Content-Type', 'text/plain');
+  res.content.set(e.toString());
+});
+
+//track logs
+app.on('log', (...args) => {
+  console.log(...args);
+});
+
+//... run it ...
+
+app.run(() => {
+  //default
+  const server = http.createServer(app.process);
+
+  //listen to server
+  server.listen(3000);
+});
 ```
