@@ -113,7 +113,7 @@ class Framework extends EventEmitter {
         priority = callbacks[index + 1];
       }
 
-      //if the callback is another framework
+      //if the callback is an EventEmitter
       if (callback instanceof EventEmitter) {
         Object.keys(callback.listeners).forEach(event => {
           this.on(event, (...args) => {

@@ -1,6 +1,6 @@
 {
   "name": "@geum/core",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Event driven core framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
