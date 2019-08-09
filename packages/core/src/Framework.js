@@ -108,7 +108,7 @@ class Framework extends EventEmitter {
       }
 
       //determine the priority
-      let priority = 0;
+      let priority = 1;
       if (typeof callbacks[index + 1] === 'number') {
         priority = callbacks[index + 1];
       }
