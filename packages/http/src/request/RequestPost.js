@@ -1,4 +1,3 @@
-const queryString = require('querystrings');
 const formidable = require('formidable');
 const { Registry } = require('@geum/core');
 
@@ -35,10 +34,55 @@ class RequestPost extends Registry {
           return reject(error);
         }
 
-        fields = queryString.stringify(fields);
-        fields = queryString.parse(fields);
+        //clone
+        fields = Object.assign(fields);
+        files = Object.assign(files);
 
-        resolve(fields)
+        const body = Registry.load();
+
+        Object.keys(fields).forEach(name => {
+          //change path to dot notation
+          let path = name
+            .replace(/\]\[/g, '.')
+            .replace('[', '.')
+            .replace(/\[/g, '')
+            .replace(/\]/g, '');
+
+          //if the field value is not an array
+          if (!Array.isArray(fields[name])) {
+            //make it an array
+            fields[name] = [fields[name]];
+          }
+
+          //now loop through each value
+          fields[name].forEach(value => {
+            //and set the value
+            body.setDot(path, value);
+          });
+        });
+
+        Object.keys(files).forEach(name => {
+          //change path to dot notation
+          let path = name
+            .replace(/\]\[/g, '.')
+            .replace('[', '.')
+            .replace(/\[/g, '')
+            .replace(/\]/g, '');
+
+          //if the field value is not an array
+          if (!Array.isArray(files[name])) {
+            //make it an array
+            files[name] = [files[name]];
+          }
+
+          //now loop through each value
+          files[name].forEach(value => {
+            //and set the value
+            body.setDot(path, value);
+          });
+        });
+
+        resolve(body.get());
       });
     });
   }

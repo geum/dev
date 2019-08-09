@@ -109,7 +109,11 @@ test('router test', async() => {
     },
     redirect: 'follow', // manual, *follow, error
     referrer: 'no-referrer', // no-referrer, *client
-    body: 'foo=bar&zoo[]=1&zoo[]=2&zoo[]=3', // body data type must match "Content-Type" header
+    body: 'foo=bar&zoo[]=1&zoo[]=2&zoo[]=3&product[title]=test'
+      + '&product[price]=1000&product[rating][]=1&product[rating][]=2'
+      + '&product[rating][]=3&product[abstract][][name]=john'
+      + '&product[abstract][][name]=james&boom[]=1',
+    // body data type must match "Content-Type" header
   });
 
   expect(await response.text()).toBe('Hello :name from /some/path');

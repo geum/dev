@@ -1,7 +1,7 @@
 ## Install
 
 ```bash
-$ npm i --save @geum/core
+$ npm i --save @geum/http
 ```
 
 ## Usage

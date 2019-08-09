@@ -121,6 +121,8 @@ class Application extends Router {
     await ResponseContent.load(response);
     await ResponseRest.load(response);
 
+    //console.log(request.file.get)
+
     //if the processors before this doesnt want to continue it
     //would have returned false so theres no need to case for that
     //try to trigger request pre-processors

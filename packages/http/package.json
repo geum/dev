@@ -17,7 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@geum/core": "^0.0.3",
+    "@geum/core": "^0.0.4",
     "formidable": "^1.2.1",
     "querystrings": "^0.4.0"
   },
