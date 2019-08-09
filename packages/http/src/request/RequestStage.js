@@ -10,7 +10,7 @@ class RequestStage extends Registry {
    */
   static async load(request) {
     //inject get into the request object
-    const registry = request.stage = new RequestStage();
+    const registry = new RequestStage();
 
     //get the get and post and the variables from path which we dont know right now....
     registry.data = Object.assign({}, request.get.data, request.post.data);

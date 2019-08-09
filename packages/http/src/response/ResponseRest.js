@@ -9,28 +9,7 @@ class ResponseRest extends Registry {
    * @return {ResponseRest}
    */
   static async load(response) {
-    //inject get into the request object
-    const registry = response.rest = new ResponseRest();
-
-    return registry;
-  }
-
-  /**
-   * REST Loader, while injecting the content into the given response
-   *
-   * @param {IncomingMessage}
-   * @param {ServerResponse}
-   *
-   * @return {ServerResponse}
-   */
-  async unload(request, response) {
-    //if there's no content
-    if (response.content.empty() && !response.rest.empty()) {
-      response.setHeader('Content-Type', 'text/json');
-      response.content.set(this.data);
-    }
-
-    return response;
+    return new ResponseRest();
   }
 
   /**

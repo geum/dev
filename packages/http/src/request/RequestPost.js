@@ -11,7 +11,11 @@ class RequestPost extends Registry {
    */
   static async load(request) {
     //inject get into the request object
-    const registry = request.post = new RequestPost();
+    const registry = new RequestPost();
+
+    if (!request.method || request.method.toLowerCase() !== 'post') {
+      return registry;
+    }
 
     //set the post
     registry.data = await RequestPost.getBody(request);

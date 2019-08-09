@@ -1,3 +1,4 @@
+const fs = require('fs');
 const http = require('http');
 const fetch = require('node-fetch');
 const { Application, Router } = require('../src');
@@ -117,4 +118,34 @@ test('router test', async() => {
   });
 
   expect(await response.text()).toBe('Hello :name from /some/path');
+});
+
+test('static file test', async() => {
+  const app = Application.load();
+
+  //make some routes
+  app.route('/note.txt').get(async(req, res) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.content.set(fs.createReadStream(__dirname + '/note.txt'));
+  });
+
+  app.run(() => {
+    const server = http.createServer(app.process);
+
+    //wait for close
+    server.on('close', () => {
+      //and properly shutdown the app
+      app.shutdown();
+    });
+
+    //as soon as the server is called and responded, close the server
+    app.on('process', () => { server.close() }, -100);
+
+    //listen to server
+    server.listen(3000);
+  });
+
+  const response = await fetch('http://127.0.0.1:3000/note.txt');
+  const text = await response.text();
+  expect(text.trim()).toBe('This is a note.');
 });

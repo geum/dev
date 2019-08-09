@@ -1,4 +1,4 @@
-const { Definition, Framework } = require('@geum/core');
+const { Definition, Framework, EventEmitter } = require('@geum/core');
 
 const RouterInterface = require('./contracts/RouterInterface');
 const Route = require('./Route');
@@ -35,7 +35,7 @@ class Router extends Framework {
    */
   use(path, ...callbacks) {
     //if path is a function
-    if (typeof path === 'function' || path instanceof Framework) {
+    if (typeof path === 'function' || path instanceof EventEmitter) {
       return super.use(path, ...callbacks);
     }
 

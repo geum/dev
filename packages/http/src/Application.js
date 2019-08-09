@@ -111,20 +111,17 @@ class Application extends Router {
    * @return {Application}
    */
   async processor(request, response) {
-    //inject the functionality for the request
-    await RequestGet.load(request);
-    await RequestPost.load(request);
-    await RequestServer.load(request);
-    await RequestStage.load(request);
-
-    //inject the functionality for the response
-    await ResponseContent.load(response);
-    await ResponseRest.load(response);
-
-    //console.log(request.file.get)
-
     //if the processors before this doesnt want to continue it
     //would have returned false so theres no need to case for that
+
+    //inject the addons for the request and response
+    request.get = await RequestGet.load(request);
+    request.post = await RequestPost.load(request);
+    request.server = await RequestServer.load(request);
+    request.stage = await RequestStage.load(request);
+    response.rest = await ResponseRest.load(response);
+    response.content = await ResponseContent.load(response);
+
     //try to trigger request pre-processors
     if (!await this.prepare(request, response)) {
       //if the request exits, then stop
@@ -145,10 +142,31 @@ class Application extends Router {
     }
 
     //dispatch
-    await response.rest.unload(request, response);
-    await response.content.unload(request, response);
 
-    response.end();
+    //if there's no content but theres rest
+    if (response.content.empty() && !response.rest.empty()) {
+      //set the content to rest
+      response.setHeader('Content-Type', 'text/json');
+      response.content.set(response.rest.get());
+    }
+
+    //if no content type
+    if (!response.getHeader('Content-Type')) {
+      //make it html
+      response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    }
+
+    //if we can stream
+    if (response.content.streamable()) {
+      //pipe it through
+      response.content.get().pipe(response);
+    //else if theres content
+    } else if (!response.content.empty()) {
+      //manually write the content
+      response.write(response.content.get());
+      //and close the connection
+      response.end();
+    }
 
     return this;
   }

@@ -10,7 +10,13 @@ class RequestServer extends Registry {
    */
   static async load(request) {
     //inject get into the request object
-    const registry = request.server = new RequestServer();
+    const registry = new RequestServer();
+
+    //if the required is not set
+    if (!request.headers || !request.headers.host || !request.url) {
+      //dont load
+      return registry;
+    }
 
     //parse url
     const protocol = RequestServer.getProtocol(request);
@@ -39,12 +45,12 @@ class RequestServer extends Registry {
       REDIRECT_STATUS: request.statusCode,
       HTTP_HOST: url.hostname,
       HTTP_USER_AGENT: request.headers['user-agent'] || null,
-      //HTTP_REFERER: ??
+      HTTP_REFERER: request.headers['referer'] || null,
       HTTP_ACCEPT: request.headers['accept'] || '*',
       HTTP_ACCEPT_ENCODING: request.headers['accept-encoding'] || '*',
       HTTP_ACCEPT_CHARSET: request.headers['accept-charset'] || '*',
       HTTP_ACCEPT_LANGUAGE: request.headers['accept-language'] || '*',
-      //HTTP_COOKIE: ??
+      HTTP_COOKIE: request.headers['cookie'] || '',
       HTTPS: protocol === 'https',
       SERVER_NAME: url.hostname,
       //SERVER_ADDR: ??

@@ -5,6 +5,7 @@ const HttpException = require('./HttpException');
 const Application = require('./Application');
 const Route = require('./Route');
 const Router = require('./Router');
+const Socket = require('./Socket');
 
 module.exports = {
   RouteInterface,
@@ -13,4 +14,5 @@ module.exports = {
   Application,
   Route,
   Router,
+  Socket
 };

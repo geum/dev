@@ -94,7 +94,38 @@ app.run(() => {
 });
 ```
 
-### Using Middleware
+### Using Socket.io
+
+```js
+//FILE: app.js
+const http = require('http');
+const socketio = require('socket.io');
+
+const { Application, Socket } = require('../../../src');
+
+const controller = require('./controller');
+const events = require('./events');
+
+const app = Application.load();
+
+app.use(controller);
+
+const socket = Socket.load();
+
+socket.use(events);
+
+app.run(() => {
+  const server = http.createServer(app.process);
+  socketio(server).use(socket.process);
+
+  //listen to server
+  server.listen(3000);
+});
+```
+
+See more in `test/samples`
+
+### Using Syncronous Middlewares
 
 ```js
 //FILE: app.js
@@ -130,12 +161,6 @@ app.use((req, res) => {
 
 //... make some routes ...
 
-//Hello World
-app.get('/', (req, res) => {
-  res.content.set('Hello World');
-});
-
-//Session Test
 app.route('/view').get((req, res) => {
   if (!req.session.views) {
     req.session.views = 0;
@@ -145,25 +170,6 @@ app.route('/view').get((req, res) => {
   res.content.set(`Viewed ${req.session.views} times`);
 });
 
-//Stage Test
-app.get('/rest/:category/search', (req, res) => {
-  res.rest.setError(false);
-  res.rest.setResults({ category: req.stage.get('category') });
-});
-
-//... listen to app events ...
-
-//track errors
-app.on('error', (e, req, res) => {
-  app.log(e);
-  res.setHeader('Content-Type', 'text/plain');
-  res.content.set(e.toString());
-});
-
-//track logs
-app.on('log', (...args) => {
-  console.log(...args);
-});
 
 //... run it ...
 

@@ -1,3 +1,4 @@
+const fs = require('fs');
 const http = require('http');
 const { Application, Router } = require('../src');
 
@@ -28,8 +29,18 @@ app.post('/:category/:name', (req, res) => {
   res.content.set('Hello :name from /some/path');
 });
 
+//make some routes
+app.route('/note.txt').get(async(req, res) => {
+  const file = __dirname + '/note.txt';
+  res.setHeader('Content-Type', 'text/plain');
+  res.content.set(fs.createReadStream(file));
+  res.content.get().pipe(res);
+  return false;
+});
+
 app.on('error', (e, req, res) => {
-  throw e
+  console.log(e);
+  res.write(e.message)
 })
 
 ///default

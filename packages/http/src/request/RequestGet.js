@@ -11,7 +11,13 @@ class RequestGet extends Registry {
    */
   static async load(request) {
     //inject get into the request object
-    const registry = request.get = new RequestGet();
+    const registry = new RequestGet();
+
+    //if the required is not set
+    if (!request.headers || !request.headers.host || !request.url) {
+      //dont load
+      return registry;
+    }
 
     //parse url
     const url = new URL('http://' + request.headers.host + request.url);
