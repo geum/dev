@@ -114,3 +114,25 @@ test('Framework use test', async () => {
   expect(initialized).toBe(true);
   expect(terminated).toBe(true);
 });
+
+test('Framework request test', async () => {
+  const app = Framework.load();
+
+  app.on('/trigger (advance) request/', (req, res) => {
+    const x = req.getStage('x');
+    res.setResults(x + 1);
+  });
+
+  const y = await app.request('trigger advance request', { x: 1 });
+
+  expect(y).toBe(2);
+
+  app.on('/trigger (advance) error/', (req, res) => {
+    const x = req.getStage('x');
+    res.setError(true, x + 1);
+  });
+
+  const z = await app.request('trigger advance error', { x: 1 });
+
+  expect(z).toBe(false);
+});

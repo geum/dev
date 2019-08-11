@@ -1,4 +1,4 @@
-const { Registry } = require('../src');
+const { Registry, Request, Response } = require('../src');
 
 test('Registry set/has/remove/get', () => {
   let registry = Registry.load();
@@ -68,4 +68,14 @@ test('Registry each', () => {
   });
 
   expect(count).toBe(1);
+});
+
+test('Request/Response test', () => {
+  const request = Request.load();
+  request.setStage('foo', 'bar');
+  expect(request.get('stage', 'foo')).toBe('bar');
+
+  const response = Response.load();
+  response.setResults('foo', 'bar');
+  expect(response.get('json', 'results', 'foo')).toBe('bar');
 });

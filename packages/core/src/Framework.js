@@ -1,4 +1,6 @@
 const EventEmitter = require('./EventEmitter');
+const Request = require('./Request');
+const Response = require('./Response');
 
 class Framework extends EventEmitter {
   /**
@@ -52,6 +54,39 @@ class Framework extends EventEmitter {
    */
   async process(...args) {
     return await this.emit('process', ...args);
+  }
+
+  /**
+   * Runs an event like a method
+   *
+   * @param {String} event
+   * @param {Request} [request = null]
+   * @param {Response} [response = null]
+   *
+   * @return {*}
+   */
+  async request(event, request = null, response = null) {
+    if (request === null) {
+      request = Request.load();
+    } else if (!(request instanceof Request)) {
+      if (typeof request === 'object') {
+        request = Request.load().setStage(request);
+      } else {
+        request = Request.load();
+      }
+    }
+
+    if (!(response instanceof Response)) {
+      response = Response.load();
+    }
+
+    await this.emit(event, request, response);
+
+    if (response.hasError()) {
+        return false;
+    }
+
+    return response.getResults();
   }
 
   /**
