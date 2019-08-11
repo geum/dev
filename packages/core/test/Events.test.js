@@ -41,7 +41,7 @@ test('trigger basic event', async () => {
     triggered.push(2);
   }, 2);
 
-  await emitter.trigger('trigger basic something', 1);
+  await emitter.emit('trigger basic something', 1);
 
   expect(triggered.length).toBe(2);
   expect(triggered[0]).toBe(2);
@@ -63,12 +63,12 @@ test('trigger advance event', async () => {
     expect(emitter.meta.variables[0]).toBe('advance')
   }, 2);
 
-  await emitter.trigger('trigger advance something', 1);
+  const actual = await emitter.emit('trigger advance something', 1);
 
   expect(triggered.length).toBe(2);
   expect(triggered[0]).toBe(2);
   expect(triggered[1]).toBe(1);
-  expect(emitter.meta).toBe(EventEmitter.STATUS_OK);
+  expect(actual).toBe(EventEmitter.STATUS_OK);
 });
 
 test('trigger incomplete event', async () => {
@@ -85,11 +85,11 @@ test('trigger incomplete event', async () => {
     return false;
   }, 2);
 
-  await emitter.trigger('trigger incomplete something', 1);
+  const actual = await emitter.emit('trigger incomplete something', 1);
 
   expect(triggered.length).toBe(1);
   expect(triggered[0]).toBe(2);
-  expect(emitter.meta).toBe(EventEmitter.STATUS_INCOMPLETE);
+  expect(actual).toBe(EventEmitter.STATUS_INCOMPLETE);
 });
 
 test('trigger unbind event', async () => {
@@ -101,19 +101,19 @@ test('trigger unbind event', async () => {
   });
 
   emitter.unbind('trigger unbind something');
-  emitter.trigger('trigger unbind something');
+  const actual = await emitter.emit('trigger unbind something');
 
   expect(triggered.length).toBe(0);
-  expect(emitter.meta).toBe(EventEmitter.STATUS_NOT_FOUND);
+  expect(actual).toBe(EventEmitter.STATUS_NOT_FOUND);
 });
 
 test('event nesting', async () => {
   const emitter = EventEmitter.load();
 
-  const actual = emitter.on('on something', async x => {
+  emitter.on('on something', async x => {
     expect(emitter.meta.event).toBe('on something');
-    await emitter.emit('on something else', x + 1);
-    expect(emitter.meta).toBe(200);
+    const actual = await emitter.emit('on something else', x + 1);
+    expect(actual).toBe(200);
   });
 
   emitter.on('on something else', x => {

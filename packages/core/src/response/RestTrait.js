@@ -33,7 +33,7 @@ class RestTrait {
    * @return {String}
    */
   getMessage() {
-    return this.getDot('json.message');
+    return this.get('json', 'message');
   }
 
   /**
@@ -170,7 +170,7 @@ class RestTrait {
   setError(status = null, message = null) {
     this.set('json', 'error', status);
 
-    if (!message === null) {
+    if (message !== null) {
       this.set('json', 'message', message);
     }
 

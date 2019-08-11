@@ -5,6 +5,7 @@ const RequestInterface = require('./contracts/RequestInterface');
 
 const ContentTrait = require('./request/ContentTrait');
 const HeaderTrait = require('./request/HeaderTrait');
+const RouteTrait = require('./request/RouteTrait');
 const StageTrait = require('./request/StageTrait');
 
 class Request extends Registry {
@@ -22,6 +23,7 @@ class Request extends Registry {
 Definition(Request).uses(
   ContentTrait,
   HeaderTrait,
+  RouteTrait,
   StageTrait
 ).implements(RequestInterface);
 

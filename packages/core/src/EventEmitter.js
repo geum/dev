@@ -35,13 +35,9 @@ class EventEmitter {
    * Sets the default state of listeners
    */
   constructor() {
-    this.meta = EventEmitter.STATUS_OK;
+    this.meta = {};
     this.regexp = [];
     this.listeners = {};
-
-    //aliases
-    this.trigger = this.emit;
-    this.off = this.unbind;
   }
 
   /**
@@ -59,17 +55,15 @@ class EventEmitter {
    * @param {String} event
    * @param {(...*)} args
    *
-   * @return {EventEmitter}
+   * @return {Integer}
    */
   async emit(event, ...args) {
-    this.meta = EventEmitter.STATUS_OK;
     const matches = this.match(event);
 
     //if there are no events found
     if (!Object.keys(matches).length) {
       //report a 404
-      this.meta = EventEmitter.STATUS_NOT_FOUND;
-      return this;
+      return EventEmitter.STATUS_NOT_FOUND;
     }
 
     const queue = new EventEmitter.QueueInterface();
@@ -99,9 +93,7 @@ class EventEmitter {
     });
 
     //call the callbacks
-    this.meta = await queue.run(...args);
-
-    return this;
+    return await queue.run(...args);
   }
 
   /**

@@ -66,6 +66,42 @@ console.log(registry.has('foo', 'bar'))
 console.log(registry.has('foo', 'zoo'))
 ```
 
+## Router Usage
+
+```js
+const { Router } = require('@geum/core')
+
+const router = Router.load();
+
+router.on('request', (req, res) => {
+  res.setResults('requested', true);
+})
+
+router.on('route test', (req, res) => {
+  const x = req.getStage('x');
+  res.setResults('x', x + 1);
+})
+
+router.on('route test', (req, res) => {
+  const x = req.getStage('x');
+  res.setError(true, x + 1);
+})
+
+router.on('response', (req, res) => {
+  res.setResults('responded', true);
+})
+
+const route = {
+  event: 'route test',
+  parameters: { x: 1 },
+  variables: [1, 2]
+};
+
+await router.route(route, (req, res) => {
+  console.log(res.getResults());
+});
+```
+
 ## Framework Usage
 
 ```js

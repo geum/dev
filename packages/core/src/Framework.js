@@ -24,17 +24,6 @@ class Framework extends EventEmitter {
   }
 
   /**
-   * Runs all the initializers
-   *
-   * @param {*} [...args]
-   *
-   * @return {Framework}
-   */
-  async initialize(...args) {
-    return await this.emit('initialize', ...args);
-  }
-
-  /**
    * logs a message
    *
    * @param {*} [...args]
@@ -100,7 +89,7 @@ class Framework extends EventEmitter {
   async run(callback, ...args) {
     //initialize
     try {
-      await this.initialize(...args);
+      await await this.emit('initialize', ...args);
     } catch(error) {
       this.error(error, ...args);
     }
@@ -109,23 +98,12 @@ class Framework extends EventEmitter {
 
     //shutdown
     try {
-      await this.shutdown(...args);
+      await this.emit('shutdown', ...args);
     } catch(error) {
       this.error(error, ...args);
     }
 
     return this;
-  }
-
-  /**
-   * Runs all the terminators
-   *
-   * @param {*} [...args]
-   *
-   * @return {Framework}
-   */
-  async shutdown(...args) {
-    return await this.emit('shutdown', ...args);
   }
 
   /**

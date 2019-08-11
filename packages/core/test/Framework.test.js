@@ -1,6 +1,6 @@
 const http = require('http')
 const fetch = require('node-fetch');
-const { Framework, EventEmitter } = require('../src');
+const { Framework, Router, EventEmitter } = require('../src');
 
 test('Framework test', async () => {
   //test variables
@@ -30,12 +30,6 @@ test('Framework test', async () => {
   app.run(async () => {
     //listen to server
     server.listen(3000);
-
-    //wait for close
-    server.on('close', () => {
-      //and properly shutdown the app
-      app.shutdown();
-    });
   })
 
   const response = await fetch('http://127.0.0.1:3000/some/path?lets=dothis', {
@@ -88,12 +82,6 @@ test('Framework use test', async () => {
   app.run(async () => {
     //listen to server
     server.listen(3000);
-
-    //wait for close
-    server.on('close', () => {
-      //and properly shutdown the app
-      app.shutdown();
-    });
   })
 
   const response = await fetch('http://127.0.0.1:3000/some/path?lets=dothis', {
@@ -135,4 +123,44 @@ test('Framework request test', async () => {
   const z = await app.request('trigger advance error', { x: 1 });
 
   expect(z).toBe(false);
+});
+
+test('Router test', async () => {
+  const router = Router.load();
+
+  router.on('request', (req, res) => {
+    res.setResults('requested', true);
+  })
+
+  router.on('route test', (req, res) => {
+    const x = req.getStage('x');
+    res.setResults('x', x + 1);
+  })
+
+  router.on('route test', (req, res) => {
+    const x = req.getStage('x');
+    res.setError(true, x + 1);
+  })
+
+  router.on('response', (req, res) => {
+    res.setResults('responded', true);
+  })
+
+  const route = {
+    event: 'route test',
+    parameters: { x: 1 },
+    variables: [1, 2]
+  };
+
+  let triggered = false;
+  await router.route(route, (req, res) => {
+    triggered = true;
+    expect(res.getResults('requested')).toBe(true);
+    expect(res.getResults('x')).toBe(2);
+    expect(res.getResults('responded')).toBe(true);
+    expect(res.hasError()).toBe(true);
+    expect(res.getMessage()).toBe(2);
+  });
+
+  expect(triggered).toBe(true);
 });

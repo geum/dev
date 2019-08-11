@@ -13,6 +13,7 @@ const Model = require('./Model');
 const Registry = require('./Registry');
 const Request = require('./Request');
 const Response = require('./Response');
+const Router = require('./Router');
 const TaskQueue = require('./TaskQueue');
 
 module.exports = {
@@ -30,5 +31,6 @@ module.exports = {
   Registry,
   Request,
   Response,
+  Router,
   TaskQueue
 };
