@@ -1,15 +1,9 @@
-const { EventEmitter } = require('@geum/core');
+const { EventEmitter, Registry } = require('@geum/core');
 
 const Router = require('./Router');
 const HttpException = require('./HttpException');
 
-const RequestGet = require('./request/RequestGet');
-const RequestPost = require('./request/RequestPost');
-const RequestServer = require('./request/RequestServer');
-const RequestStage = require('./request/RequestStage');
-
-const ResponseContent = require('./response/ResponseContent');
-const ResponseRest = require('./response/ResponseRest');
+const map = require('./map/http');
 
 class Application extends Router {
   /**
@@ -66,9 +60,7 @@ class Application extends Router {
       status = (await this.emit('response', request, response)).meta;
     } catch(error) {
       //if there is an error
-      response.statusCode = 500;
-      response.statusMessage = Application.STATUS_500;
-
+      response.setStatus(500, Application.STATUS_500);
       status = (await this.emit('error', error, request, response)).meta;
     }
 
@@ -92,9 +84,7 @@ class Application extends Router {
       status = (await this.emit('request', request, response)).meta;
     } catch(error) {
       //if there is an error
-      response.statusCode = 500;
-      response.statusMessage = Application.STATUS_500;
-
+      response.setStatus(500, Application.STATUS_500);
       status = (await this.emit('error', error, request, response)).meta;
     }
 
@@ -114,13 +104,11 @@ class Application extends Router {
     //if the processors before this doesnt want to continue it
     //would have returned false so theres no need to case for that
 
-    //inject the addons for the request and response
-    request.get = await RequestGet.load(request);
-    request.post = await RequestPost.load(request);
-    request.server = await RequestServer.load(request);
-    request.stage = await RequestStage.load(request);
-    response.rest = await ResponseRest.load(response);
-    response.content = await ResponseContent.load(response);
+    //make a payload
+    const payload = await map.makePayload(request, response);
+
+    request = payload.request;
+    response = payload.response;
 
     //try to trigger request pre-processors
     if (!await this.prepare(request, response)) {
@@ -142,31 +130,7 @@ class Application extends Router {
     }
 
     //dispatch
-
-    //if there's no content but theres rest
-    if (response.content.empty() && !response.rest.empty()) {
-      //set the content to rest
-      response.setHeader('Content-Type', 'text/json');
-      response.content.set(response.rest.get());
-    }
-
-    //if no content type
-    if (!response.getHeader('Content-Type')) {
-      //make it html
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-    }
-
-    //if we can stream
-    if (response.content.streamable()) {
-      //pipe it through
-      response.content.get().pipe(response);
-    //else if theres content
-    } else if (!response.content.empty()) {
-      //manually write the content
-      response.write(response.content.get());
-      //and close the connection
-      response.end();
-    }
+    map.dispatch(response);
 
     return this;
   }
@@ -183,8 +147,8 @@ class Application extends Router {
     let status = EventEmitter.STATUS_OK, error = null;
 
     //build the event name
-    const path = request.url.split('?')[0];
-    const method = request.method;
+    const path = request.getPath('string');
+    const method = request.getMethod();
     const event = method + ' ' + path;
 
     //try to trigger the routes with the request and response
@@ -192,9 +156,7 @@ class Application extends Router {
       status = (await this.emit(event, request, response)).meta;
     } catch(error) {
       //if there is an error
-      response.statusCode = 500;
-      response.statusMessage = Application.STATUS_500;
-
+      response.setStatus(500, Application.STATUS_500);
       status = (await this.emit('error', error, request, response)).meta;
     }
 
@@ -207,10 +169,11 @@ class Application extends Router {
 
     //check for content
     //check for redirect
-    if (response.content.empty() && response.rest.empty() && !response.getHeader('Location')) {
-      response.statusCode = 404;
-      response.statusMessage = Application.STATUS_404;
-
+    if (!response.hasContent()
+      && !response.hasJson()
+      && !response.getHeader('Location')
+    ) {
+      response.setStatus(404, Application.STATUS_404);
       error = new HttpException(Application.STATUS_404, 404);
       status = (await this.emit('error', error, request, response)).meta;
     }

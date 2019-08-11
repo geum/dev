@@ -1,6 +1,6 @@
 const fs = require('fs');
 const http = require('http');
-const { Application, Router } = require('../src');
+const { Application, Router } = require('../../../src');
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -11,7 +11,7 @@ const app = Application.load();
 
 //make some routes
 app.route('/some/path').get((req, res) => {
-  res.content.set(
+  res.setContent(
     '<form enctype="multipart/form-data" method="post">' +
     '<input type="text" name="product[product_title]" /><br>' +
     '<input type="file" name="product[product_image]" multiple="multiple" /><br>' +
@@ -21,26 +21,23 @@ app.route('/some/path').get((req, res) => {
 });
 
 app.post('/some/path', (req, res) => {
-  res.content.set('Hello again from /some/path');
+  res.setContent('Hello again from /some/path');
 });
 
 app.post('/:category/:name', (req, res) => {
-  res.rest.setError(true, 'Something went wrong');
-  res.content.set('Hello :name from /some/path');
+  res.setError(true, 'Something went wrong');
+  res.setContent('Hello :name from /some/path');
 });
 
-//make some routes
 app.route('/note.txt').get(async(req, res) => {
   const file = __dirname + '/note.txt';
   res.setHeader('Content-Type', 'text/plain');
-  res.content.set(fs.createReadStream(file));
-  res.content.get().pipe(res);
-  return false;
+  res.setContent(fs.createReadStream(file));
 });
 
 app.on('error', (e, req, res) => {
   console.log(e);
-  res.write(e.message)
+  res.setContent(e.message)
 })
 
 ///default

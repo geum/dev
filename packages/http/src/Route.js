@@ -99,8 +99,11 @@ class Route {
         }
       });
 
-      request.stage.set(parameters);
-      request.event = { name, variables, parameters};
+      request.setStage(parameters).setRoute({
+        event: name,
+        variables,
+        parameters
+      });
 
       return callback(request, ...args);
     }, priority);

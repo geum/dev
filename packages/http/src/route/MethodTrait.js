@@ -1,4 +1,4 @@
-const methods = require('../methods');
+const methods = require('../map/methods');
 
 module.exports = {};
 

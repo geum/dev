@@ -8,16 +8,16 @@ test('server test', async() => {
 
   //make some routes
   app.route('/some/path').post((req, res) => {
-    res.content.set('Hello from /some/path');
+    res.setContent('Hello from /some/path');
   });
 
   app.post('/some/path', (req, res) => {
-    res.content.set('Hello again from /some/path');
+    res.setContent('Hello again from /some/path');
   });
 
   app.post('/:category/:name', (req, res) => {
-    res.rest.setError(true, 'Something went wrong');
-    res.content.set('Hello :name from /some/path');
+    res.setError(true, 'Something went wrong');
+    res.setContent('Hello :name from /some/path');
   });
 
   ///default
@@ -62,16 +62,16 @@ test('router test', async() => {
 
   //make some routes
   router1.route('/some/path').post((req, res) => {
-    res.content.set('Hello from /some/path');
+    res.setContent('Hello from /some/path');
   });
 
   router2.post('/some/path', (req, res) => {
-    res.content.set('Hello again from /some/path');
+    res.setContent('Hello again from /some/path');
   });
 
   router2.post('/:category/:name', (req, res) => {
-    res.rest.setError(true, 'Something went wrong');
-    res.content.set('Hello :name from /some/path');
+    res.setError(true, 'Something went wrong');
+    res.setContent('Hello :name from /some/path');
   });
 
   app.use(router1, router2);
@@ -126,7 +126,7 @@ test('static file test', async() => {
   //make some routes
   app.route('/note.txt').get(async(req, res) => {
     res.setHeader('Content-Type', 'text/plain');
-    res.content.set(fs.createReadStream(__dirname + '/note.txt'));
+    res.setContent(fs.createReadStream(__dirname + '/note.txt'));
   });
 
   app.run(() => {

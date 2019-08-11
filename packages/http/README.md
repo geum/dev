@@ -17,13 +17,13 @@ const app = Application.load();
 
 //Hello World
 app.get('/', (req, res) => {
-  res.content.set('Hello World');
+  res.setContent('Hello World');
 });
 
 //Stage Test
 app.get('/rest/:category/search', (req, res) => {
-  res.rest.setError(false);
-  res.rest.setResults({ category: req.stage.get('category') });
+  res.setError(false);
+  res.setResults({ category: req.getStage('category') });
 });
 
 //... listen to app events ...
@@ -32,7 +32,7 @@ app.get('/rest/:category/search', (req, res) => {
 app.on('error', (e, req, res) => {
   app.log(e);
   res.setHeader('Content-Type', 'text/plain');
-  res.content.set(e.toString());
+  res.setContent(e.toString());
 });
 
 //track logs
@@ -57,24 +57,24 @@ app.run(() => {
 // FILE: controller.js
 const { Router } = require('@geum/http');
 
-const router = module.exports = HttpRouter.load();
+const router = module.exports = Router.load();
 
 //Hello World
 router.get('/', (req, res) => {
-  res.content.set('Hello World');
+  res.setContent('Hello World');
 });
 
 //Stage Test
 router.get('/rest/:category/search', (req, res) => {
-  res.rest.setError(false);
-  res.rest.setResults({ category: req.stage.get('category') });
+  res.setError(false);
+  res.setResults({ category: req.getStage('category') });
 });
 
 //...
 // FILE: app.js
 
 const http = require('http');
-const { Application } = require('@geum/core');
+const { Application } = require('@geum/http');
 const controller = require('./controller')
 
 const app = Application.load();
@@ -101,7 +101,7 @@ app.run(() => {
 const http = require('http');
 const socketio = require('socket.io');
 
-const { Application, Socket } = require('../../../src');
+const { Application, Socket } = require('@geum/http');
 
 const controller = require('./controller');
 const events = require('./events');
@@ -161,15 +161,35 @@ app.use((req, res) => {
 
 //... make some routes ...
 
-app.route('/view').get((req, res) => {
-  if (!req.session.views) {
-    req.session.views = 0;
-  }
-
-  req.session.views++;
-  res.content.set(`Viewed ${req.session.views} times`);
+app.route('/cookie').get((req, res) => {
+  const views = (req.getCookie('views') || 0) + 1;
+  res.setContent(`Viewed ${views} times`);
+  res.setCookie('views', views);
 });
 
+app.route('/session').get((req, res) => {
+  const views = (req.getSession('views') || 0) + 1;
+  res.setContent(`Viewed ${views} times`);
+  res.setSession('views', views);
+});
+
+app.on('request', (req, res) => {
+  //load the session
+  const incomingMessage = req.IncomingMessage;
+  const session = Object.assign({}, incomingMessage.session);
+  delete session.cookie;
+  req.setSession(session);
+  res.setSession(session);
+});
+
+app.on('response', (req, res) => {
+  //unload the session
+  const session = req.getSession();
+  const incomingMessage = req.IncomingMessage;
+  Object.keys(session).forEach(name => {
+    incomingMessage.session[name] = session[name];
+  });
+});
 
 //... run it ...
 

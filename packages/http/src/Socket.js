@@ -1,16 +1,11 @@
 const { EventEmitter } = require('@geum/core');
 
-const Router = require('./Router');
 const Application = require('./Application');
+const Request = require('./Request');
+const Response = require('./Response');
 const HttpException = require('./HttpException');
 
-const RequestGet = require('./request/RequestGet');
-const RequestPost = require('./request/RequestPost');
-const RequestServer = require('./request/RequestServer');
-const RequestStage = require('./request/RequestStage');
-
-const ResponseContent = require('./response/ResponseContent');
-const ResponseRest = require('./response/ResponseRest');
+const map = require('./map/socket');
 
 class Socket extends Application {
   /**
@@ -52,17 +47,11 @@ class Socket extends Application {
     //if the processors before this doesnt want to continue it
     //would have returned false so theres no need to case for that
 
-    //get the request and response from socket
-    const req = socket.client.request;
-    const res = socket.client.request.res;
-
     //inject the addons for the request and response
-    req.get = await RequestGet.load(req);
-    req.post = await RequestPost.load(req);
-    req.server = await RequestServer.load(req);
-    req.stage = await RequestStage.load(req);
-    res.rest = await ResponseRest.load(res);
-    res.content = await ResponseContent.load(res);
+    const payload = await map.makePayload(
+      socket.client.request,
+      socket.client.request.res
+    );
 
     //route socket to app events
     const onevent = socket.onevent;
@@ -76,23 +65,36 @@ class Socket extends Application {
       }
 
       //clone the request and response
-      const request = Object.assign({}, req);
-      const response = Object.assign({}, res);
+      const request = Request.load(
+        Object.assign({}, payload.request.get())
+      );
+
+      const response = Response.load(
+        Object.assign({}, payload.response.get())
+      );
 
       //set the request
-      request.event = args.shift();
-      request.packet = packet;
       packet.session = socket.id;
+      request.setRoute({
+        event: args.shift(),
+        variables: [],
+        parameters: {},
+        packet: packet
+      })
 
       //if there's data
       if (packet.data && typeof packet.data[0] !== 'undefined') {
+        request.set('route', 'parameters', packet.data[0]);
         //set stage and post
-        request.stage.set(packet.data[0]);
-        request.post.set(packet.data[0]);
+        request.setStage(packet.data[0]);
+        request.setPost(packet.data[0]);
       }
 
       //set the response
-      response.socket = socket;
+      const route = JSON.parse(JSON.stringify(request.getRoute()));
+      route.socket = socket;
+      route.target = 'self';
+      response.setRoute(route);
 
       //try to trigger request pre-processors
       if (!await this.prepare(request, response)) {
@@ -114,23 +116,7 @@ class Socket extends Application {
       }
 
       //dispatch
-
-      // SOCKET LEGEND:
-      // response.socket.emit - send to self
-      // response.socket.nsp.emit - send to all
-      // response.socket.server.emit - send to all
-
-      //if there's no content but theres rest
-      if (response.content.empty() && !response.rest.empty()) {
-        response.socket.nsp.emit(request.event, response.rest.get());
-        //if we can stream
-      } else if (response.content.streamable()) {
-        //TODO: pipe it through
-        //response.content.get().pipe(response);
-      //else if theres content
-      } else if (!response.content.empty()) {
-        response.socket.nsp.emit(request.event, response.content.get());
-      }
+      map.dispatch(response);
     };
 
     next();
@@ -150,16 +136,14 @@ class Socket extends Application {
     let status = EventEmitter.STATUS_OK, error = null;
 
     //build the event name
-    const event = request.event;
+    const event = request.getRoute('event');
 
     //try to trigger the routes with the request and response
     try {
       status = (await this.emit(event, request, response)).meta;
     } catch(error) {
       //if there is an error
-      response.statusCode = 500;
-      response.statusMessage = Application.STATUS_500;
-
+      response.setStatus(500, Socket.STATUS_500);
       status = (await this.emit('error', error, request, response)).meta;
     }
 
@@ -172,8 +156,9 @@ class Socket extends Application {
 
     //check for content
     //check for redirect
-    if (response.content.empty() && response.rest.empty()) {
-      error = new HttpException(Application.STATUS_404, 404);
+    if (!response.hasContent() && !response.hasJson()) {
+      response.setStatus(404, Socket.STATUS_404);
+      error = new HttpException(Socket.STATUS_404, 404);
       status = (await this.emit('error', error, request, response)).meta;
     }
 
