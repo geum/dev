@@ -79,41 +79,49 @@ class Framework extends EventEmitter {
   /**
    * Shortcut for middleware
    *
-   * @param {Function} [...callbacks]
+   * @param {Function} [callback]
+   * @param {Integer} [priority = 1]
    *
    * @return {Framework}
    */
-  use(...callbacks) {
-    callbacks.forEach((callback, index) => {
-      if (callback instanceof Array) {
-        this.use(...callback);
-        return;
-      }
+  use(callback, priority = 1) {
+    if (typeof priority === 'function' || arguments.length > 2) {
+      Array.from(arguments).forEach((callback, index) => {
+        if (callback instanceof Array) {
+          this.use(...callback);
+          return;
+        }
 
-      //determine the priority
-      let priority = 1;
-      if (typeof callbacks[index + 1] === 'number') {
-        priority = callbacks[index + 1];
-      }
+        //determine the priority
+        if (typeof arguments[index + 1] === 'number') {
+          priority = arguments[index + 1];
+        }
 
-      //if the callback is an EventEmitter
-      if (callback instanceof EventEmitter) {
-        Object.keys(callback.listeners).forEach(event => {
-          this.on(event, (...args) => {
-            callback.emit(event, ...args);
-          }, priority);
-        });
+        this.use(callback, priority);
+      });
 
-        return;
-      }
+      return this;
+    }
 
-      //if a callback is not a function
-      if (typeof callback !== 'function') {
-        return;
-      }
+    if (typeof priority !== 'number') {
+      priority = 1;
+    }
 
+    //if the callback is an EventEmitter
+    if (callback instanceof EventEmitter) {
+      Object.keys(callback.listeners).forEach(event => {
+        this.on(event, (...args) => {
+          callback.emit(event, ...args);
+        }, priority);
+      });
+
+      return this;
+    }
+
+    //if a callback is not a function
+    if (typeof callback === 'function') {
       this.on('process', callback, priority);
-    })
+    }
 
     return this;
   }
