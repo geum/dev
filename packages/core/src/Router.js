@@ -21,7 +21,7 @@ class Router extends EventEmitter {
   /**
    * Static loader
    *
-   * @return {Framework}
+   * @return {Router}
    */
   static load() {
     return new Router();
@@ -32,7 +32,7 @@ class Router extends EventEmitter {
    *
    * @param {Function} [...callbacks]
    *
-   * @return {Framework}
+   * @return {Router}
    */
   use(...callbacks) {
     callbacks.forEach((callback, index) => {
@@ -70,104 +70,47 @@ class Router extends EventEmitter {
   }
 
   /**
-   * Runs the 'response' event and interprets
+   * Runs an event like a method
    *
-   * @param {RequestInterface} request
-   * @param {ResponseInterface} response
+   * @param {String} event
+   * @param {Request} [request = null]
+   * @param {Response} [response = null]
    *
-   * @return {Boolean} whether its okay to continue
+   * @return {*}
    */
-  async dispatch(request, response) {
-    let status = EventEmitter.STATUS_OK, error = null;
-
-    try {
-      //emit a response event
-      status = await this.emit('response', request, response);
-    } catch(error) {
-      //if there is an error
-      response.setStatus(500, Router.STATUS_500);
-      status = await this.emit('error', error, request, response);
+  async request(event, request = null, response = null) {
+    if (request === null) {
+      request = Request.load();
+    } else if (!(request instanceof Request)) {
+      if (typeof request === 'object') {
+        request = Request.load().setStage(request);
+      } else {
+        request = Request.load();
+      }
     }
 
-    //if the status was incomplete (308)
-    return status !== EventEmitter.STATUS_INCOMPLETE;
+    if (!(response instanceof Response)) {
+      response = Response.load();
+    }
+
+    await this.emit(event, request, response);
+
+    if (response.hasError()) {
+        return false;
+    }
+
+    return response.getResults();
   }
 
   /**
-   * Runs 'request' event and interprets
+   * Runs the route
    *
-   * @param {RequestInterface} request
-   * @param {ResponseInterface} response
+   * @param {Object} route
+   * @param {Function} [dispatch = null]
    *
-   * @return {Boolean} whether its okay to continue
+   * @return {Router}
    */
-  async prepare(request, response) {
-    let status = EventEmitter.STATUS_OK, error = null;
-
-    try {
-      //emit a request event
-      status = await this.emit('request', request, response);
-    } catch(error) {
-      //if there is an error
-      response.setStatus(500, Router.STATUS_500);
-      status = await this.emit('error', error, request, response);
-    }
-
-    //if the status was incomplete (308)
-    return status !== EventEmitter.STATUS_INCOMPLETE;
-  }
-
-  /**
-   * Runs the route event and interprets
-   *
-   * @param {RequestInterface} request
-   * @param {ResponseInterface} response
-   *
-   * @return {Boolean} whether its okay to continue
-   */
-  async process(request, response) {
-    let status = EventEmitter.STATUS_OK, error = null;
-
-    //build the event name
-    const event = request.getRoute('event');
-
-    //try to trigger the routes with the request and response
-    try {
-      status = await this.emit(event, request, response);
-    } catch(error) {
-      //if there is an error
-      response.setStatus(500, Router.STATUS_500);
-      status = await this.emit('error', error, request, response);
-    }
-
-    //if the status was incomplete (308)
-    if (status === EventEmitter.STATUS_INCOMPLETE) {
-      //the callback that set that should have already processed
-      //the request and is signaling to no longer conitnue
-      return false;
-    }
-
-    //check for content
-    //check for redirect
-    if (!response.hasContent() && !response.hasJson()) {
-      response.setStatus(404, Router.STATUS_404);
-      error = new HttpException(Router.STATUS_404, 404);
-      status = await this.emit('error', error, request, response);
-    }
-
-    //if the status was incomplete (308)
-    return status !== EventEmitter.STATUS_INCOMPLETE;
-  }
-
-  /**
-   * Processor to add to the process stack
-   *
-   * @param {RequestInterface} request
-   * @param {ResponseInterface} response
-   *
-   * @return {Application}
-   */
-  async route(route, dispatch = null) {
+  async run(route, dispatcher = null) {
     //route - { event, variables, parameters, request, response }
     route = Object.assign({}, route);
 
@@ -191,30 +134,120 @@ class Router extends EventEmitter {
     request.setRoute(route);
 
     //try to trigger request pre-processors
-    if (!await this.prepare(request, response)) {
+    if (!await prepare.call(this, request, response)) {
       //if the request exits, then stop
       return this;
     }
 
     // from here we can assume that it is okay to
     // continue with processing the routes
-    if (!await this.process(request, response)) {
+    if (!await process.call(this, request, response)) {
       //if the request exits, then stop
       return this;
     }
 
     //last call before dispatch
-    if (!await this.dispatch(request, response)) {
+    if (!await dispatch.call(this, request, response)) {
       //if the dispatch exits, then stop
       return this;
     }
 
-    if (typeof dispatch === 'function') {
-      dispatch(request, response);
+    if (typeof dispatcher === 'function') {
+      dispatcher(request, response);
     }
 
     return this;
   }
+}
+
+/**
+ * Runs the 'response' event and interprets
+ *
+ * @param {RequestInterface} request
+ * @param {ResponseInterface} response
+ *
+ * @return {Boolean} whether its okay to continue
+ */
+async function dispatch(request, response) {
+  let status = EventEmitter.STATUS_OK, error = null;
+
+  try {
+    //emit a response event
+    status = await this.emit('response', request, response);
+  } catch(error) {
+    //if there is an error
+    response.setStatus(500, Router.STATUS_500);
+    status = await this.emit('error', error, request, response);
+  }
+
+  //if the status was incomplete (308)
+  return status !== EventEmitter.STATUS_INCOMPLETE;
+}
+
+/**
+ * Runs 'request' event and interprets
+ *
+ * @param {RequestInterface} request
+ * @param {ResponseInterface} response
+ *
+ * @return {Boolean} whether its okay to continue
+ */
+async function prepare(request, response) {
+  let status = EventEmitter.STATUS_OK, error = null;
+
+  try {
+    //emit a request event
+    status = await this.emit('request', request, response);
+  } catch(error) {
+    //if there is an error
+    response.setStatus(500, Router.STATUS_500);
+    status = await this.emit('error', error, request, response);
+  }
+
+  //if the status was incomplete (308)
+  return status !== EventEmitter.STATUS_INCOMPLETE;
+}
+
+/**
+ * Runs the route event and interprets
+ *
+ * @param {RequestInterface} request
+ * @param {ResponseInterface} response
+ *
+ * @return {Boolean} whether its okay to continue
+ */
+async function process(request, response) {
+  let status = EventEmitter.STATUS_OK, error = null;
+
+  //build the event name
+  const event = request.getRoute('event');
+
+  //try to trigger the routes with the request and response
+  try {
+    status = await this.emit(event, request, response);
+  } catch(error) {
+    //if there is an error
+    response.setStatus(500, Router.STATUS_500);
+    status = await this.emit('error', error, request, response);
+  }
+
+  //if the status was incomplete (308)
+  if (status === EventEmitter.STATUS_INCOMPLETE) {
+    //the callback that set that should have already processed
+    //the request and is signaling to no longer conitnue
+    return false;
+  }
+
+  //check for content
+  //check for redirect
+  if (!response.hasContent() && !response.hasJson()) {
+    response.setStatus(404, Router.STATUS_404);
+    error = new HttpException(Router.STATUS_404, 404);
+    status = await this.emit('error', error, request, response);
+  }
+
+  //if the status was incomplete (308)
+  return status !== EventEmitter.STATUS_INCOMPLETE;
 }
 
 module.exports = Router;

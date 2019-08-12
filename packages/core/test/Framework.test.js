@@ -103,28 +103,6 @@ test('Framework use test', async () => {
   expect(terminated).toBe(true);
 });
 
-test('Framework request test', async () => {
-  const app = Framework.load();
-
-  app.on('/trigger (advance) request/', (req, res) => {
-    const x = req.getStage('x');
-    res.setResults(x + 1);
-  });
-
-  const y = await app.request('trigger advance request', { x: 1 });
-
-  expect(y).toBe(2);
-
-  app.on('/trigger (advance) error/', (req, res) => {
-    const x = req.getStage('x');
-    res.setError(true, x + 1);
-  });
-
-  const z = await app.request('trigger advance error', { x: 1 });
-
-  expect(z).toBe(false);
-});
-
 test('Router test', async () => {
   const router = Router.load();
 
@@ -146,21 +124,51 @@ test('Router test', async () => {
     res.setResults('responded', true);
   })
 
-  const route = {
-    event: 'route test',
-    parameters: { x: 1 },
-    variables: [1, 2]
-  };
+  const app = Framework.load();
 
-  let triggered = false;
-  await router.route(route, (req, res) => {
-    triggered = true;
-    expect(res.getResults('requested')).toBe(true);
-    expect(res.getResults('x')).toBe(2);
-    expect(res.getResults('responded')).toBe(true);
-    expect(res.hasError()).toBe(true);
-    expect(res.getMessage()).toBe(2);
+  app.on('process', (route) => {
+    let triggered = false;
+    router.run(route, (req, res) => {
+      triggered = true;
+      expect(res.getResults('requested')).toBe(true);
+      expect(res.getResults('x')).toBe(2);
+      expect(res.getResults('responded')).toBe(true);
+      expect(res.hasError()).toBe(true);
+      expect(res.getMessage()).toBe(2);
+    });
+
+    expect(triggered).toBe(true);
+  })
+
+  app.run(() => {
+    const route = {
+      event: 'route test',
+      parameters: { x: 1 },
+      variables: [1, 2]
+    };
+
+    app.process(route);
+  })
+});
+
+test('Router request test', async () => {
+  const router = Router.load();
+
+  router.on('/trigger (advance) request/', (req, res) => {
+    const x = req.getStage('x');
+    res.setResults(x + 1);
   });
 
-  expect(triggered).toBe(true);
+  const y = await router.request('trigger advance request', { x: 1 });
+
+  expect(y).toBe(2);
+
+  router.on('/trigger (advance) error/', (req, res) => {
+    const x = req.getStage('x');
+    res.setError(true, x + 1);
+  });
+
+  const z = await router.request('trigger advance error', { x: 1 });
+
+  expect(z).toBe(false);
 });

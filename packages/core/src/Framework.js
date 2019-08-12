@@ -1,6 +1,4 @@
 const EventEmitter = require('./EventEmitter');
-const Request = require('./Request');
-const Response = require('./Response');
 
 class Framework extends EventEmitter {
   /**
@@ -42,40 +40,17 @@ class Framework extends EventEmitter {
    * @return {Framework}
    */
   async process(...args) {
-    return await this.emit('process', ...args);
-  }
+    let status = EventEmitter.STATUS_OK, error = null;
 
-  /**
-   * Runs an event like a method
-   *
-   * @param {String} event
-   * @param {Request} [request = null]
-   * @param {Response} [response = null]
-   *
-   * @return {*}
-   */
-  async request(event, request = null, response = null) {
-    if (request === null) {
-      request = Request.load();
-    } else if (!(request instanceof Request)) {
-      if (typeof request === 'object') {
-        request = Request.load().setStage(request);
-      } else {
-        request = Request.load();
-      }
+    try {
+      //emit a request event
+      status = await this.emit('process', ...args);
+    } catch(error) {
+      status = await this.emit('error', error, ...args);
     }
 
-    if (!(response instanceof Response)) {
-      response = Response.load();
-    }
-
-    await this.emit(event, request, response);
-
-    if (response.hasError()) {
-        return false;
-    }
-
-    return response.getResults();
+    //if the status was incomplete (308)
+    return status !== EventEmitter.STATUS_INCOMPLETE;
   }
 
   /**
@@ -87,21 +62,16 @@ class Framework extends EventEmitter {
    * @return {Framework}
    */
   async run(callback, ...args) {
-    //initialize
-    try {
-      await await this.emit('initialize', ...args);
-    } catch(error) {
-      this.error(error, ...args);
+    //try to trigger initializers
+    if (!await initialize.apply(this, args)) {
+      //if the request exits, then stop
+      return this;
     }
 
     await callback();
 
     //shutdown
-    try {
-      await this.emit('shutdown', ...args);
-    } catch(error) {
-      this.error(error, ...args);
-    }
+    await shutdown.apply(this, args);
 
     return this;
   }
@@ -147,6 +117,52 @@ class Framework extends EventEmitter {
 
     return this;
   }
+}
+
+/**
+ * Runs the 'initialize' event and interprets
+ *
+ * @param {RequestInterface} request
+ * @param {ResponseInterface} response
+ *
+ * @return {Boolean} whether its okay to continue
+ */
+async function initialize(...args) {
+  let status = EventEmitter.STATUS_OK, error = null;
+
+  try {
+    //emit a response event
+    status = await this.emit('initialize', ...args);
+  } catch(error) {
+    //if there is an error
+    status = await this.emit('error', error, ...args);
+  }
+
+  //if the status was incomplete (308)
+  return status !== EventEmitter.STATUS_INCOMPLETE;
+}
+
+/**
+ * Runs the 'initialize' event and interprets
+ *
+ * @param {RequestInterface} request
+ * @param {ResponseInterface} response
+ *
+ * @return {Boolean} whether its okay to continue
+ */
+async function shutdown(...args) {
+  let status = EventEmitter.STATUS_OK, error = null;
+
+  try {
+    //emit a response event
+    status = await this.emit('shutdown', ...args);
+  } catch(error) {
+    //if there is an error
+    status = await this.emit('error', error, ...args);
+  }
+
+  //if the status was incomplete (308)
+  return status !== EventEmitter.STATUS_INCOMPLETE;
 }
 
 //adapter
