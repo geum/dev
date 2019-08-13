@@ -8,10 +8,9 @@ const Response = require('./Response');
 
 const EventEmitter = require('../EventEmitter');
 const Exception = require('../Exception');
-const Registry = require('../Registry');
 const Router = require('../Router');
 
-class Route extends Registry {
+class Route {
   /**
    * Route Loader
    *
@@ -21,11 +20,7 @@ class Route extends Registry {
    * @return {Route}
    */
   static load(router, event) {
-    if (!Definition(router).instanceOf(RouterInterface)) {
-      throw Exception.forInvalidArgument(0, RouterInterface, router);
-    }
-
-    return new Route({ router, event });
+    return new Route(router, event);
   }
 
   /**
@@ -35,12 +30,12 @@ class Route extends Registry {
    *
    * @return {Route}
    */
-  setArgs(args) {
+  set args(args) {
     if (!(args instanceof Array)) {
       throw Exception.forInvalidArgument(0, Array, args);
     }
 
-    return this.set('args', args);
+    this.data.args = args
   }
 
   /**
@@ -50,12 +45,12 @@ class Route extends Registry {
    *
    * @return {Route}
    */
-  setParameters(parameters) {
+  set parameters(parameters) {
     if (typeof parameters !== 'object') {
       throw Exception.forInvalidArgument(0, Object, args);
     }
 
-    return this.set('parameters', parameters);
+    this.data.parameters = parameters;
   }
 
   /**
@@ -65,12 +60,12 @@ class Route extends Registry {
    *
    * @return {Route}
    */
-  setRequest(request) {
+  set request(request) {
     if (!Definition(request).instanceOf(RequestInterface)) {
       throw Exception.forInvalidArgument(0, RequestInterface, request);
     }
 
-    return this.set('request', request);
+    this.data.request = request;
   }
 
   /**
@@ -80,12 +75,28 @@ class Route extends Registry {
    *
    * @return {Route}
    */
-  setResponse(response) {
+  set response(response) {
     if (!Definition(response).instanceOf(ResponseInterface)) {
       throw Exception.forInvalidArgument(0, ResponseInterface, response);
     }
 
-    return this.set('response', response);
+    this.data.response = response;
+  }
+
+  /**
+   * Sets router and event
+   *
+   * @param {RouterInterface} router
+   * @param {String} event
+   *
+   * @return {Route}
+   */
+  constructor(router, event) {
+    if (!Definition(router).instanceOf(RouterInterface)) {
+      throw Exception.forInvalidArgument(0, RouterInterface, router);
+    }
+
+    this.data = { router, event };
   }
 
   /**
@@ -94,14 +105,14 @@ class Route extends Registry {
    * @return {Response}
    */
   async emit() {
-    const router = this.get('router');
+    const router = this.data.router;
 
-    const request = this.get('request') || new Route.Request();
-    const response = this.get('response') || new Route.Response();
+    const request = this.data.request || new Route.Request();
+    const response = this.data.response || new Route.Response();
 
-    const event = this.get('event');
-    const args = this.get('args') || [];
-    const parameters = this.get('parameters') || {};
+    const event = this.data.event;
+    const args = this.data.args || [];
+    const parameters = this.data.parameters || {};
 
     request
       .setStage(parameters)

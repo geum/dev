@@ -24,15 +24,15 @@ class Router extends EventEmitter {
    * @return {Route}
    */
   route(event, request = null, response = null) {
-    const route = new Router.Route({router: this, event});
+    const route = new Router.Route(this, event);
 
     //if its not a request
     if (!(request instanceof Request)) {
       //if it's an array
       if (request instanceof Array) {
-        route.setArgs(request);
+        route.args = request;
       } else if (typeof request === 'object' && request !== null) {
-        route.setParameters(Object.assign({}, request));
+        route.parameters = Object.assign({}, request);
       }
 
       //make a request
@@ -46,7 +46,8 @@ class Router extends EventEmitter {
     }
 
     //set the request and response
-    route.setRequest(request).setResponse(response);
+    route.request = request;
+    route.response = response;
 
     return route;
   }
@@ -60,9 +61,17 @@ class Router extends EventEmitter {
    * @return {Framework}
    */
   use(callback, priority = 0) {
-    if (typeof priority === 'function' || arguments.length > 2) {
+    //if priority is not a number ie. EventEmitter, Router, etc.
+    //or there are more than 2 arguments...
+    if (typeof priority !== 'number' || arguments.length > 2) {
+      //set the priority to 0
+      priority = 0;
+
+      //loop through each argument as callback
       Array.from(arguments).forEach((callback, index) => {
+        //if the callback is an array
         if (callback instanceof Array) {
+          //recall use()
           this.use(...callback);
           return;
         }
@@ -72,12 +81,14 @@ class Router extends EventEmitter {
           priority = arguments[index + 1];
         }
 
+        //recall use() in a singular way
         this.use(callback, priority);
       });
 
       return this;
     }
 
+    //make sure priority is a number
     if (typeof priority !== 'number') {
       priority = 0;
     }

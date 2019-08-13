@@ -23,10 +23,10 @@ test('Router test', async () => {
     res.setResults('responded', true);
   })
 
-  const route = router
-    .route('route test')
-    .setArgs([1, 2])
-    .setParameters({ x: 1 });
+  const route = router.route('route test')
+
+  route.args = [1, 2];
+  route.parameters = { x: 1 };
 
   const res = await route.emit();
 

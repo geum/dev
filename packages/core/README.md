@@ -69,65 +69,22 @@ console.log(registry.has('foo', 'zoo'))
 ## Router Usage
 
 ```js
-const { Router } = require('@geum/core')
-
 const router = Router.load();
 
-router.on('request', (req, res) => {
-  res.setResults('requested', true);
-})
-
-router.on('route test', (req, res) => {
+router.on('GET /some/path', (req, res) => {
   const x = req.getStage('x');
-  res.setResults('x', x + 1);
-})
-
-router.on('route test', (req, res) => {
-  const x = req.getStage('x');
-  res.setError(true, x + 1);
-})
-
-router.on('response', (req, res) => {
-  res.setResults('responded', true);
-})
-
-const route = {
-  event: 'route test',
-  parameters: { x: 1 },
-  variables: [1, 2]
-};
-
-await router.route(route, (req, res) => {
-  console.log(res.getResults());
+  res.setContent(String(x + 1));
 });
-```
 
-## Framework Usage
+const server = http.createServer(async (req, res) => {
+  const method = req.method.toUpperCase();
+  const path = req.url.split('?')[0];
+  const route = router.route(method + ' ' + path, { x: 1 });
+  const response = await route.emit();
 
-```js
+  res.write(response.getContent());
+  res.end();
+});
 
-const http = require('http')
-const { Framework } = require('@geum/core')
-
-const app = Framework.load()
-
-app.on('initialize', async() => {
-  console.log('I am initializing')
-})
-
-app.on('process', async(req, res) => {
-  console.log('i am processing')
-})
-
-app.run(async() => {
-  //create the server
-  const server = http.createServer(app.process.bind(app))
-
-  //do something
-  //...
-
-  //listen to server
-  server.listen(3000)
-})
-
+server.listen(3000);
 ```
