@@ -1,16 +1,16 @@
 {
-  "name": "@geum/http",
-  "version": "0.0.9",
-  "description": "Event driven HTTP framework",
+  "name": "@geum/socket",
+  "version": "0.0.1",
+  "description": "Event driven Socket framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
-  "homepage": "https://github.com/geum/http#readme",
+  "homepage": "https://github.com/geum/socket#readme",
   "bugs": {
-    "url": "https://github.com/geum/http/issues"
+    "url": "https://github.com/geum/socket/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/geum/http.git"
+    "url": "git+https://github.com/geum/socket.git"
   },
   "main": "src/index.js",
   "scripts": {
