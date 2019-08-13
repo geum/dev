@@ -1,4 +1,7 @@
 const Router = require('./Router');
+const Route = require('./router/Route');
+const Request = require('./router/Request');
+const Response = require('./router/Response');
 
 const map = require('./map/http');
 
@@ -33,7 +36,9 @@ module.exports = () => {
 };
 
 module.exports.Router = Router;
-
+module.exports.Route = Route;
+module.exports.Request = Request;
+module.exports.Response = Response;
 module.exports.Map = map;
 
 function mixin(destination, source) {
