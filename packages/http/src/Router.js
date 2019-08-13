@@ -1,4 +1,4 @@
-const { Definition, Router: CoreRouter } = require('@geum/core');
+const { Definition, EventEmitter, Router: CoreRouter } = require('@geum/core');
 
 const MethodTrait = require('./router/MethodTrait');
 
@@ -17,47 +17,79 @@ class Router extends CoreRouter {
   }
 
   /**
-   * Returns a route
-   *
-   * @param {String} event
-   * @param {Request} [request = null]
-   * @param {Response} [response = null]
-   *
-   * @return {Route}
+   * Sets the default state of listeners
    */
-  route(event, request = null, response = null) {
-    const route = new Router.Route(this, event);
+  constructor() {
+    super();
+    this.RouteInterace = Router.RouteInterace;
+    this.RequestInterface = Router.RequestInterface;
+    this.ResponseInterface = Router.ResponseInterface;
+  }
 
-    //if its not a request
-    if (!(request instanceof Request)) {
-      //if it's an array
-      if (request instanceof Array) {
-        route.args = request;
-      } else if (typeof request === 'object' && request !== null) {
-        route.parameters = Object.assign({}, request);
-      }
+  /**
+   * Shortcut for middleware
+   *
+   * @param {Function} [callback]
+   * @param {Integer} [priority = 1]
+   *
+   * @return {Framework}
+   */
+  use(callback, priority = 0) {
+    //if priority is not a number ie. EventEmitter, Router, etc.
+    //or there are more than 2 arguments...
+    if (typeof priority !== 'number' || arguments.length > 2) {
+      //set the priority to 0
+      priority = 0;
 
-      //make a request
-      request = new Router.Request();
+      //loop through each argument as callback
+      Array.from(arguments).forEach((callback, index) => {
+        //if the callback is an array
+        if (callback instanceof Array) {
+          //recall use()
+          this.use(...callback);
+          return;
+        }
+
+        //determine the priority
+        if (typeof arguments[index + 1] === 'number') {
+          priority = arguments[index + 1];
+        }
+
+        //recall use() in a singular way
+        this.use(callback, priority);
+      });
+
+      return this;
     }
 
-    //if its not a response
-    if (!(response instanceof Response)) {
-      //make a response
-      response = new Router.Response();
+    //make sure priority is a number
+    if (typeof priority !== 'number') {
+      priority = 0;
     }
 
-    //set the request and response
-    route.request = request
-    route.response = response;
+    //if the callback is an EventEmitter
+    if (callback instanceof EventEmitter) {
+      Object.keys(callback.listeners).forEach(event => {
+        this.on(event, (...args) => {
+          callback.emit(event, ...args);
+        }, priority);
+      });
 
-    return route;
+      return this;
+    }
+
+    //if a callback is not a function
+    if (typeof callback === 'function') {
+      this.on('open', callback, priority);
+    }
+
+    return this;
   }
 }
 
-Router.Route = Route;
-Router.Request = Request;
-Router.Response = Response;
+Router.RouteInterace = Route;
+Router.RequestInterface = Request;
+Router.ResponseInterface = Response;
 
 Definition(Router).uses(MethodTrait);
 

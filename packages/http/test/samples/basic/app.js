@@ -1,13 +1,13 @@
 const fs = require('fs');
 const http = require('http');
-const { Application, Router } = require('../../../src');
+const geum = require('../../../src');
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
   // application specific logging, throwing an error, or other logic here
 });
 
-const app = Application.load();
+const app = geum();
 
 //make some routes
 app.route('/some/path').get((req, res) => {
@@ -41,10 +41,7 @@ app.on('error', (e, req, res) => {
 })
 
 ///default
-const server = http.createServer(app.process);
-
-//initialze the app
-app.initialize();
+const server = http.createServer(app);
 
 //listen to server
 server.listen(3000);

@@ -4,6 +4,8 @@ const map = require('./map/http');
 
 module.exports = () => {
   async function HTTPServer(request, response) {
+    await HTTPServer.emit('open', request, response);
+
     //make a payload
     const payload = await map.makePayload(request, response);
     const method = payload.request.getMethod();

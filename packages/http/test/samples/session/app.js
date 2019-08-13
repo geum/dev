@@ -1,10 +1,10 @@
 const http = require('http');
 
-const { Application, Socket } = require('../../../src');
+const geum = require('../../../src');
 
 const controller = require('./controller');
 
-const app = Application.load();
+const app = geum();
 
 const cookie = require('cookie-parser')();
 const session = require('express-session')({
@@ -55,9 +55,7 @@ app.on('error', (e, req, res) => {
   res.setContent(e.message)
 })
 
-app.run(() => {
-  const server = http.createServer(app.process);
+const server = http.createServer(app);
 
-  //listen to server
-  server.listen(3000);
-});
+//listen to server
+server.listen(3000);
