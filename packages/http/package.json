@@ -1,6 +1,6 @@
 {
   "name": "@geum/http",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Event driven HTTP framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@geum/core": "^0.0.9",
+    "@geum/core": "^0.0.13",
     "cookie": "^0.4.0",
     "formidable": "^1.2.1",
     "querystrings": "^0.4.0"

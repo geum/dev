@@ -4,8 +4,8 @@ const cookie = require('cookie');
 
 const { Registry } = require('@geum/core');
 
-const Request = require('../Request');
-const Response = require('../Response');
+const Request = require('../router/Request');
+const Response = require('../router/Response');
 
 module.exports = {
   async makePayload(incomingMessage, serverResponse) {
@@ -15,7 +15,7 @@ module.exports = {
     return { request, response };
   },
 
-  dispatch(response) {
+  dispatcher(request, response) {
     const serverResponse = response.ServerResponse;
     //serialize all the cookies
     const cookies = [];

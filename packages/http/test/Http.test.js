@@ -1,10 +1,10 @@
 const fs = require('fs');
 const http = require('http');
 const fetch = require('node-fetch');
-const { Application, Router } = require('../src');
+const geum = require('../src');
 
 test('server test', async() => {
-  const app = Application.load();
+  const app = geum();
 
   //make some routes
   app.route('/some/path').post((req, res) => {
@@ -20,23 +20,14 @@ test('server test', async() => {
     res.setContent('Hello :name from /some/path');
   });
 
-  ///default
-  const server = http.createServer(app.process);
+  //default
+  const server = http.createServer(app);
 
-  //initialze the app
-  app.initialize();
+  //as soon as the server is called and responded, close the server
+  app.on('close', () => { server.close() });
 
   //listen to server
   server.listen(3000);
-
-  //wait for close
-  server.on('close', () => {
-    //and properly shutdown the app
-    app.shutdown();
-  });
-
-  //as soon as the server is called and responded, close the server
-  app.on('process', () => { server.close() }, -100);
 
   const response = await fetch('http://127.0.0.1:3000/some/path?lets=dothis', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -56,9 +47,9 @@ test('server test', async() => {
 });
 
 test('router test', async() => {
-  const app = Application.load();
-  const router1 = Router.load();
-  const router2 = Router.load();
+  const app = geum();
+  const router1 = geum.Router.load();
+  const router2 = geum.Router.load();
 
   //make some routes
   router1.route('/some/path').post((req, res) => {
@@ -76,28 +67,14 @@ test('router test', async() => {
 
   app.use(router1, router2);
 
-  ///default
-  const server = http.createServer(app.process);
+  //default
+  const server = http.createServer(app);
 
-  //initialze the app
-  app.initialize();
+  //as soon as the server is called and responded, close the server
+  app.on('close', () => { server.close() });
 
   //listen to server
   server.listen(3000);
-
-  //handle errors
-  app.on('error', (e, req, res) => {
-    throw e;
-  });
-
-  //wait for close
-  server.on('close', () => {
-    //and properly shutdown the app
-    app.shutdown();
-  });
-
-  //as soon as the server is called and responded, close the server
-  app.on('process', () => { server.close() }, -100);
 
   const response = await fetch('http://127.0.0.1:3000/some/path?lets=dothis', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -121,7 +98,7 @@ test('router test', async() => {
 });
 
 test('static file test', async() => {
-  const app = Application.load();
+  const app = geum();
 
   //make some routes
   app.route('/note.txt').get(async(req, res) => {
@@ -129,21 +106,14 @@ test('static file test', async() => {
     res.setContent(fs.createReadStream(__dirname + '/note.txt'));
   });
 
-  app.run(() => {
-    const server = http.createServer(app.process);
+  //default
+  const server = http.createServer(app);
 
-    //wait for close
-    server.on('close', () => {
-      //and properly shutdown the app
-      app.shutdown();
-    });
+  //as soon as the server is called and responded, close the server
+  app.on('close', () => { server.close() });
 
-    //as soon as the server is called and responded, close the server
-    app.on('process', () => { server.close() }, -100);
-
-    //listen to server
-    server.listen(3000);
-  });
+  //listen to server
+  server.listen(3000);
 
   const response = await fetch('http://127.0.0.1:3000/note.txt');
   const text = await response.text();

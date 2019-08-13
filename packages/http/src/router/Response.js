@@ -2,12 +2,13 @@ const { Definition, Response: CoreResponse } = require('@geum/core');
 
 const CookieTrait = require('./response/CookieTrait');
 const PageTrait = require('./response/PageTrait');
-const RouteTrait = require('./response/RouteTrait');
 const SessionTrait = require('./response/SessionTrait');
 
 class Response extends CoreResponse {
   /**
    * Response Loader
+   *
+   * @param {Object} data
    *
    * @return {Response}
    */
@@ -17,7 +18,7 @@ class Response extends CoreResponse {
 }
 
 //definition check
-Definition(Response).uses(CookieTrait, PageTrait, RouteTrait, SessionTrait);
+Definition(Response).uses(CookieTrait, PageTrait, SessionTrait);
 
 //adapter
 module.exports = Response;

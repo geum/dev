@@ -1,12 +1,14 @@
-const { Definition, Framework, EventEmitter } = require('@geum/core');
+const { Definition, Router: CoreRouter } = require('@geum/core');
 
-const RouterInterface = require('./contracts/RouterInterface');
-const Route = require('./Route');
 const MethodTrait = require('./router/MethodTrait');
 
-class Router extends Framework {
+const Route = require('./router/Route');
+const Request = require('./router/Request');
+const Response = require('./router/Response');
+
+class Router extends CoreRouter {
   /**
-   * Router Loader
+   * Static loader
    *
    * @return {Router}
    */
@@ -15,44 +17,48 @@ class Router extends Framework {
   }
 
   /**
-   * Returns an instance of a single route
+   * Returns a route
    *
-   * @param {String} path
+   * @param {String} event
+   * @param {Request} [request = null]
+   * @param {Response} [response = null]
    *
-   * @return {RouteInterface}
+   * @return {Route}
    */
-  route(path) {
-    return new Router.RouteInterface(this, path);
-  }
+  route(event, request = null, response = null) {
+    const route = new Router.Route(this, event);
 
-  /**
-   * Mounts the specified function at the specified path
-   *
-   * @param {String} path
-   * @param {Function} [...callbacks]
-   *
-   * @return {Router}
-   */
-  use(path, ...callbacks) {
-    //if path is a function
-    if (typeof path === 'function' || path instanceof EventEmitter) {
-      return super.use(path, ...callbacks);
+    //if its not a request
+    if (!(request instanceof Request)) {
+      //if it's an array
+      if (request instanceof Array) {
+        route.args = request;
+      } else if (typeof request === 'object' && request !== null) {
+        route.parameters = Object.assign({}, request);
+      }
+
+      //make a request
+      request = new Router.Request();
     }
 
-    if (typeof path === 'string' || path instanceof RegExp) {
-      //same as all method
-      this.all(path, ...callbacks);
+    //if its not a response
+    if (!(response instanceof Response)) {
+      //make a response
+      response = new Router.Response();
     }
 
-    return this;
+    //set the request and response
+    route.request = request
+    route.response = response;
+
+    return route;
   }
 }
 
-//allows interfaces to be manually changed
-Router.RouteInterface = Route;
+Router.Route = Route;
+Router.Request = Request;
+Router.Response = Response;
 
-//definition check
-Definition(Router).uses(MethodTrait).implements(RouterInterface);
+Definition(Router).uses(MethodTrait);
 
-//adapter
 module.exports = Router;

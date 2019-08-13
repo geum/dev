@@ -11,6 +11,8 @@ class Request extends CoreRequest {
   /**
    * Request Loader
    *
+   * @param {Object} data
+   *
    * @return {Request}
    */
   static load(data = {}) {
