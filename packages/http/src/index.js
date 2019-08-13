@@ -34,6 +34,8 @@ module.exports = () => {
 
 module.exports.Router = Router;
 
+module.exports.Map = map;
+
 function mixin(destination, source) {
     let invalid = [
       'constructor',
