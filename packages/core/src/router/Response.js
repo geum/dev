@@ -1,7 +1,7 @@
-const Definition = require('./Definition');
-const Registry = require('./Registry');
+const Definition = require('../Definition');
+const Registry = require('../Registry');
 
-const ResponseInterface = require('./contracts/ResponseInterface');
+const ResponseInterface = require('../contracts/ResponseInterface');
 
 const ContentTrait = require('./response/ContentTrait');
 const HeaderTrait = require('./response/HeaderTrait');
@@ -12,10 +12,12 @@ class Response extends Registry {
   /**
    * Response Loader
    *
+   * @param {Object} data
+   *
    * @return {Response}
    */
-  static load(message) {
-    return new Response();
+  static load(data = {}) {
+    return new Response(data);
   }
 }
 

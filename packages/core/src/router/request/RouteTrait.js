@@ -2,17 +2,16 @@ class RouteTrait {
   /**
    * Returns route data given name or all route data
    *
-   * @param {String} [name=null] The key name in the route
-   * @param {*} [...args]
+   * @param {Integer} [index=null] The variable index
    *
-   * @return mixed
+   * @return {*}
    */
-  getRoute(name = null, ...args) {
-    if (!name) {
-      return this.get('route');
+  getArgs(index = null) {
+    if (!index) {
+      return this.getRoute('args');
     }
 
-    return this.get('route', name, ...args);
+    return this.getRoute('args', index);
   }
 
   /**
@@ -33,16 +32,17 @@ class RouteTrait {
   /**
    * Returns route data given name or all route data
    *
-   * @param {Integer} [index=null] The variable index
+   * @param {String} [name=null] The key name in the route
+   * @param {*} [...args]
    *
-   * @return {*}
+   * @return mixed
    */
-  getVariables(index = null) {
-    if (!index) {
-      return this.getRoute('variables');
+  getRoute(name = null, ...args) {
+    if (!name) {
+      return this.get('route');
     }
 
-    return this.getRoute('variables', index);
+    return this.get('route', name, ...args);
   }
 
   /**

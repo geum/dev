@@ -1,7 +1,7 @@
-const Definition = require('./Definition');
-const Registry = require('./Registry');
+const Definition = require('../Definition');
+const Registry = require('../Registry');
 
-const RequestInterface = require('./contracts/RequestInterface');
+const RequestInterface = require('../contracts/RequestInterface');
 
 const ContentTrait = require('./request/ContentTrait');
 const HeaderTrait = require('./request/HeaderTrait');
@@ -12,10 +12,12 @@ class Request extends Registry {
   /**
    * Request Loader
    *
+   * @param {Object} data
+   *
    * @return {Request}
    */
-  static load() {
-    return new Request();
+  static load(data = {}) {
+    return new Request(data);
   }
 }
 

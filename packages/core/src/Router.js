@@ -1,23 +1,10 @@
 const EventEmitter = require('./EventEmitter');
 
-const Request = require('./Request');
-const Response = require('./Response');
+const Route = require('./router/Route');
+const Request = require('./router/Request');
+const Response = require('./router/Response');
 
 class Router extends EventEmitter {
-  /**
-   * @const STATUS_404
-   */
-  static get STATUS_404() {
-    return '404 Not Found';
-  }
-
-  /**
-   * @const STATUS_500
-   */
-  static get STATUS_500() {
-    return '500 Server Error';
-  }
-
   /**
    * Static loader
    *
@@ -28,43 +15,88 @@ class Router extends EventEmitter {
   }
 
   /**
+   * Returns a route
+   *
+   * @param {String} event
+   * @param {Request} [request = null]
+   * @param {Response} [response = null]
+   *
+   * @return {Route}
+   */
+  route(event, request = null, response = null) {
+    const route = new Router.Route({router: this, event});
+
+    //if its not a request
+    if (!(request instanceof Request)) {
+      //if it's an array
+      if (request instanceof Array) {
+        route.setArgs(request);
+      } else if (typeof request === 'object' && request !== null) {
+        route.setParameters(Object.assign({}, request));
+      }
+
+      //make a request
+      request = new Router.Request();
+    }
+
+    //if its not a response
+    if (!(response instanceof Response)) {
+      //make a response
+      response = new Router.Response();
+    }
+
+    //set the request and response
+    route.setRequest(request).setResponse(response);
+
+    return route;
+  }
+
+  /**
    * Shortcut for middleware
    *
-   * @param {Function} [...callbacks]
+   * @param {Function} [callback]
+   * @param {Integer} [priority = 1]
    *
-   * @return {Router}
+   * @return {Framework}
    */
-  use(...callbacks) {
-    callbacks.forEach((callback, index) => {
-      if (callback instanceof Array) {
-        this.use(...callback);
-        return;
-      }
+  use(callback, priority = 0) {
+    if (typeof priority === 'function' || arguments.length > 2) {
+      Array.from(arguments).forEach((callback, index) => {
+        if (callback instanceof Array) {
+          this.use(...callback);
+          return;
+        }
 
-      //determine the priority
-      let priority = 1;
-      if (typeof callbacks[index + 1] === 'number') {
-        priority = callbacks[index + 1];
-      }
+        //determine the priority
+        if (typeof arguments[index + 1] === 'number') {
+          priority = arguments[index + 1];
+        }
 
-      //if the callback is an EventEmitter
-      if (callback instanceof EventEmitter) {
-        Object.keys(callback.listeners).forEach(event => {
-          this.on(event, (...args) => {
-            callback.emit(event, ...args);
-          }, priority);
-        });
+        this.use(callback, priority);
+      });
 
-        return;
-      }
+      return this;
+    }
 
-      //if a callback is not a function
-      if (typeof callback !== 'function') {
-        return;
-      }
+    if (typeof priority !== 'number') {
+      priority = 0;
+    }
 
+    //if the callback is an EventEmitter
+    if (callback instanceof EventEmitter) {
+      Object.keys(callback.listeners).forEach(event => {
+        this.on(event, (...args) => {
+          callback.emit(event, ...args);
+        }, priority);
+      });
+
+      return this;
+    }
+
+    //if a callback is not a function
+    if (typeof callback === 'function') {
       this.on('request', callback, priority);
-    })
+    }
 
     return this;
   }
@@ -79,175 +111,24 @@ class Router extends EventEmitter {
    * @return {*}
    */
   async request(event, request = null, response = null) {
-    if (request === null) {
-      request = Request.load();
-    } else if (!(request instanceof Request)) {
-      if (typeof request === 'object') {
-        request = Request.load().setStage(request);
-      } else {
-        request = Request.load();
-      }
-    }
+    //make the route
+    const route = this.route(event, request, response);
 
-    if (!(response instanceof Response)) {
-      response = Response.load();
-    }
+    //run the route
+    response = await route.emit();
 
-    await this.emit(event, request, response);
-
+    //if theres an error
     if (response.hasError()) {
         return false;
     }
 
     return response.getResults();
   }
-
-  /**
-   * Runs the route
-   *
-   * @param {Object} route
-   * @param {Function} [dispatch = null]
-   *
-   * @return {Router}
-   */
-  async run(route, dispatcher = null) {
-    //route - { event, variables, parameters, request, response }
-    route = Object.assign({}, route);
-
-    let request = null, response = null;
-
-    if (route.request instanceof Request) {
-      request = route.request;
-      delete route.request;
-    } else {
-      request = Request.load();
-    }
-
-    if (route.response instanceof Response) {
-      response = route.response;
-      delete route.response;
-    } else {
-      response = Response.load();
-    }
-
-    request.setStage(route.parameters);
-    request.setRoute(route);
-
-    //try to trigger request pre-processors
-    if (!await prepare.call(this, request, response)) {
-      //if the request exits, then stop
-      return this;
-    }
-
-    // from here we can assume that it is okay to
-    // continue with processing the routes
-    if (!await process.call(this, request, response)) {
-      //if the request exits, then stop
-      return this;
-    }
-
-    //last call before dispatch
-    if (!await dispatch.call(this, request, response)) {
-      //if the dispatch exits, then stop
-      return this;
-    }
-
-    if (typeof dispatcher === 'function') {
-      dispatcher(request, response);
-    }
-
-    return this;
-  }
 }
 
-/**
- * Runs the 'response' event and interprets
- *
- * @param {RequestInterface} request
- * @param {ResponseInterface} response
- *
- * @return {Boolean} whether its okay to continue
- */
-async function dispatch(request, response) {
-  let status = EventEmitter.STATUS_OK, error = null;
+Router.Route = Route;
+Router.Request = Request;
+Router.Response = Response;
 
-  try {
-    //emit a response event
-    status = await this.emit('response', request, response);
-  } catch(error) {
-    //if there is an error
-    response.setStatus(500, Router.STATUS_500);
-    status = await this.emit('error', error, request, response);
-  }
-
-  //if the status was incomplete (308)
-  return status !== EventEmitter.STATUS_INCOMPLETE;
-}
-
-/**
- * Runs 'request' event and interprets
- *
- * @param {RequestInterface} request
- * @param {ResponseInterface} response
- *
- * @return {Boolean} whether its okay to continue
- */
-async function prepare(request, response) {
-  let status = EventEmitter.STATUS_OK, error = null;
-
-  try {
-    //emit a request event
-    status = await this.emit('request', request, response);
-  } catch(error) {
-    //if there is an error
-    response.setStatus(500, Router.STATUS_500);
-    status = await this.emit('error', error, request, response);
-  }
-
-  //if the status was incomplete (308)
-  return status !== EventEmitter.STATUS_INCOMPLETE;
-}
-
-/**
- * Runs the route event and interprets
- *
- * @param {RequestInterface} request
- * @param {ResponseInterface} response
- *
- * @return {Boolean} whether its okay to continue
- */
-async function process(request, response) {
-  let status = EventEmitter.STATUS_OK, error = null;
-
-  //build the event name
-  const event = request.getRoute('event');
-
-  //try to trigger the routes with the request and response
-  try {
-    status = await this.emit(event, request, response);
-  } catch(error) {
-    //if there is an error
-    response.setStatus(500, Router.STATUS_500);
-    status = await this.emit('error', error, request, response);
-  }
-
-  //if the status was incomplete (308)
-  if (status === EventEmitter.STATUS_INCOMPLETE) {
-    //the callback that set that should have already processed
-    //the request and is signaling to no longer conitnue
-    return false;
-  }
-
-  //check for content
-  //check for redirect
-  if (!response.hasContent() && !response.hasJson()) {
-    response.setStatus(404, Router.STATUS_404);
-    error = new HttpException(Router.STATUS_404, 404);
-    status = await this.emit('error', error, request, response);
-  }
-
-  //if the status was incomplete (308)
-  return status !== EventEmitter.STATUS_INCOMPLETE;
-}
 
 module.exports = Router;
