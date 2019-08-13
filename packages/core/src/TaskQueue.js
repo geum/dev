@@ -1,6 +1,9 @@
 const Definition = require('./Definition');
 const QueueInterface = require('./contracts/QueueInterface');
 
+/**
+ * A task queue linearly executes each task
+ */
 class TaskQueue {
   /**
    * @const {Integer} STATUS_EMPTY

@@ -4,6 +4,10 @@ const Route = require('./router/Route');
 const Request = require('./router/Request');
 const Response = require('./router/Response');
 
+/**
+ * A router parses a request and determines
+ * where and what to route to matching callbacks
+ */
 class Router extends EventEmitter {
   /**
    * Static loader
@@ -12,6 +16,17 @@ class Router extends EventEmitter {
    */
   static load() {
     return new Router();
+  }
+
+  /**
+   * Sets the default state of listeners
+   */
+  constructor() {
+    super();
+
+    this.RouteInterace = Router.RouteInterace;
+    this.RequestInterface = Router.RequestInterface;
+    this.ResponseInterface = Router.ResponseInterface;
   }
 
   /**
@@ -24,7 +39,7 @@ class Router extends EventEmitter {
    * @return {Route}
    */
   route(event, request = null, response = null) {
-    const route = new Router.Route(this, event);
+    const route = new this.RouteInterace(this, event);
 
     //if its not a request
     if (!(request instanceof Request)) {
@@ -36,13 +51,13 @@ class Router extends EventEmitter {
       }
 
       //make a request
-      request = new Router.Request();
+      request = new this.RequestInterface();
     }
 
     //if its not a response
     if (!(response instanceof Response)) {
       //make a response
-      response = new Router.Response();
+      response = new this.ResponseInterface();
     }
 
     //set the request and response
@@ -137,9 +152,10 @@ class Router extends EventEmitter {
   }
 }
 
-Router.Route = Route;
-Router.Request = Request;
-Router.Response = Response;
+//allows interfaces to be manually changed
+Router.RouteInterace = Route;
+Router.RequestInterface = Request;
+Router.ResponseInterface = Response;
 
-
+//adapter
 module.exports = Router;

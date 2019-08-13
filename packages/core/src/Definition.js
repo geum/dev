@@ -1,6 +1,9 @@
 const Exception = require('./Exception');
 const Helper = require('./Helper');
 
+/**
+ * Definition helps with constructing classes polyfilling interfaces and traits
+ */
 class Definition {
   /**
    * Sets the definition

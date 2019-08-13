@@ -1,3 +1,6 @@
+/**
+ * Random Helper Methods
+ */
 class Helper {
   /**
    * Looper

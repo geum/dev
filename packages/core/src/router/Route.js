@@ -97,6 +97,9 @@ class Route {
     }
 
     this.data = { router, event };
+
+    this.RequestInterface = Route.RequestInterface;
+    this.ResponseInterface = Route.ResponseInterface;
   }
 
   /**
@@ -107,8 +110,8 @@ class Route {
   async emit() {
     const router = this.data.router;
 
-    const request = this.data.request || new Route.Request();
-    const response = this.data.response || new Route.Response();
+    const request = this.data.request || new this.RequestInterface();
+    const response = this.data.response || new this.ResponseInterface();
 
     const event = this.data.event;
     const args = this.data.args || [];
@@ -236,7 +239,7 @@ async function process(router, request, response) {
   return status !== EventEmitter.STATUS_INCOMPLETE;
 }
 
-Route.Request = Request;
-Route.Response = Response;
+Route.RequestInterface = Request;
+Route.ResponseInterface = Response;
 
 module.exports = Route;

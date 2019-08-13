@@ -38,6 +38,8 @@ class EventEmitter {
     this.meta = {};
     this.regexp = [];
     this.listeners = {};
+    //allows interfaces to be manually changed
+    this.QueueInterface = EventEmitter.QueueInterface;
   }
 
   /**
@@ -66,7 +68,7 @@ class EventEmitter {
       return EventEmitter.STATUS_NOT_FOUND;
     }
 
-    const queue = new EventEmitter.QueueInterface();
+    const queue = new this.QueueInterface();
 
     Object.keys(matches).forEach(key => {
       const match = matches[key];
