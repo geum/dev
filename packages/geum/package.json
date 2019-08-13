@@ -1,0 +1,35 @@
+{
+  "name": "geum",
+  "version": "0.0.0",
+  "description": "Event driven Application",
+  "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
+  "license": "MIT",
+  "homepage": "https://github.com/geum/geum#readme",
+  "bugs": {
+    "url": "https://github.com/geum/geum/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geum/geum.git"
+  },
+  "main": "src/index.js",
+  "bin": {
+    "geum": "./bin/geum.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "@geum/core": "0.0.14",
+    "@geum/http": "0.0.12",
+    "@geum/socket": "0.0.1",
+    "cookie-parser": "^1.4.4",
+    "express-session": "^1.16.2",
+    "inquirer": "^6.5.1",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0",
+    "nodemon": "^1.19.1"
+  }
+}
