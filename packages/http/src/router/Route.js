@@ -14,7 +14,6 @@ class Route extends CoreRoute {
    * @return {Route}
    */
   static load(router, event) {
-    console.log('in route')
     if (!Definition(router).instanceOf(RouterInterface)) {
       throw Exception.forInvalidArgument(0, RouterInterface, router);
     }
