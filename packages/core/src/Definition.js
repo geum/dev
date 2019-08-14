@@ -233,4 +233,7 @@ function getArgumentClause(callback) {
 //adapter
 module.exports = definition => {
   return new Definition(definition);
-}
+};
+
+module.exports.getMethods = Definition.getMethods;
+module.exports.nativeMethods = Definition.nativeMethods;
