@@ -1,11 +1,12 @@
-const { Request, Router } = require('@geum/http');
-//const Router = require('./Router');
+const { Definition } = require('@geum/core');
+const { Request, Router, Route } = require('@geum/http');
+
 const Response = require('./router/Response');
 
 const map = require('./map/socket');
 
 module.exports = () => {
-  async function SocketServer(socket, next) {
+  async function Server(socket, next) {
     //inject the addons for the request and response
     const payload = await map.makePayload(
       socket.client.request,
@@ -55,7 +56,7 @@ module.exports = () => {
       data.channel = 'self';
       response.setRoute(data);
 
-      const route = SocketServer.route(data.event, request, response);
+      const route = Server.route(data.event, request, response);
 
       await route.emit();
 
@@ -68,46 +69,19 @@ module.exports = () => {
 
   //merge router methods
   const router = Router.load();
+  const methods = Definition.getMethods(router);
 
-  mixin(SocketServer, router);
+  Object.keys(methods).forEach(method => {
+    Server[method] = router[method].bind(router);
+  });
 
-  return SocketServer;
+  Server.router = router;
+
+  return Server;
 };
 
 module.exports.Router = Router;
-
-function mixin(destination, source) {
-    let invalid = [
-      'constructor',
-      '__defineGetter__',
-      '__defineSetter__',
-      'hasOwnProperty',
-      '__lookupGetter__',
-      '__lookupSetter__',
-      'isPrototypeOf',
-      'propertyIsEnumerable',
-      'toString',
-      'valueOf',
-      'toLocaleString'
-    ]
-
-    function methods(prototype) {
-      if (!prototype) {
-        return;
-      }
-
-      Object.getOwnPropertyNames(prototype).forEach(property => {
-        if(invalid.indexOf(property) !== -1) {
-          return;
-        }
-
-        if (prototype[property] instanceof Function) {
-          destination[property] = source[property].bind(source);
-        }
-      });
-
-      methods(Object.getPrototypeOf(prototype));
-    }
-
-    methods(source);
-}
+module.exports.Route = Route;
+module.exports.Request = Request;
+module.exports.Response = Response;
+module.exports.Map = map;
