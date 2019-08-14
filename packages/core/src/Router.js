@@ -1,3 +1,5 @@
+const Definition = require('./Definition');
+
 const EventEmitter = require('./EventEmitter');
 
 const Route = require('./router/Route');
@@ -42,9 +44,9 @@ class Router extends EventEmitter {
     const route = new this.RouteInterace(this, event);
 
     //if its not a request
-    if (!(request instanceof Request)) {
+    if (!Definition(request).instanceOf(Request)) {
       //if it's an array
-      if (request instanceof Array) {
+      if (Array.isArray(request)) {
         route.args = request;
       } else if (typeof request === 'object' && request !== null) {
         route.parameters = Object.assign({}, request);
@@ -55,7 +57,7 @@ class Router extends EventEmitter {
     }
 
     //if its not a response
-    if (!(response instanceof Response)) {
+    if (!Definition(response).instanceOf(Response)) {
       //make a response
       response = new this.ResponseInterface();
     }
@@ -85,7 +87,7 @@ class Router extends EventEmitter {
       //loop through each argument as callback
       Array.from(arguments).forEach((callback, index) => {
         //if the callback is an array
-        if (callback instanceof Array) {
+        if (Array.isArray(callback)) {
           //recall use()
           this.use(...callback);
           return;
@@ -109,7 +111,7 @@ class Router extends EventEmitter {
     }
 
     //if the callback is an EventEmitter
-    if (callback instanceof EventEmitter) {
+    if (Definition(callback).instanceOf(EventEmitter)) {
       Object.keys(callback.listeners).forEach(event => {
         this.on(event, (...args) => {
           callback.emit(event, ...args);

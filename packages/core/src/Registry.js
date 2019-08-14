@@ -94,7 +94,7 @@ class Registry {
       return this;
     }
 
-    if (list instanceof Array && !list.length) {
+    if (Array.isArray(list) && !list.length) {
       return this;
     }
 

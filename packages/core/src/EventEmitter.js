@@ -136,7 +136,7 @@ class EventEmitter {
       }
 
       let variables = [];
-      if (match instanceof Array) {
+      if (Array.isArray(match)) {
         variables = match.slice();
         variables.shift();
       }
@@ -158,7 +158,7 @@ class EventEmitter {
    */
   on(event, callback, priority = 0) {
     //deal with multiple events
-    if (event instanceof Array) {
+    if (Array.isArray(event)) {
       event.forEach((event) => {
         this.on(event, callback, priority);
       });

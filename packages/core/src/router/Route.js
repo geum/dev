@@ -31,7 +31,7 @@ class Route {
    * @return {Route}
    */
   set args(args) {
-    if (!(args instanceof Array)) {
+    if (!Array.isArray(args)) {
       throw Exception.forInvalidArgument(0, Array, args);
     }
 

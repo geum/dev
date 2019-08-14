@@ -35,7 +35,7 @@ class ContentTrait {
    */
   setContent(content) {
     //if it's an array
-    if (content instanceof Array) {
+    if (Array.isArray(content)) {
       content = JSON.stringify(content, null, 2);
     }
 

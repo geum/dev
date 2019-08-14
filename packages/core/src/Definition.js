@@ -12,8 +12,7 @@ class Definition {
    */
   constructor(definition) {
     this.definition = definition;
-    this.properties = Definition.getPrototype(definition);
-    this.methods = Object.getOwnPropertyNames(this.properties);
+    this.methods = Definition.getMethods(definition);
   }
 
   /**
@@ -32,26 +31,14 @@ class Definition {
       return this;
     }
 
-    const properties = Definition.getPrototype(definition);
-    const methods = Object.getOwnPropertyNames(properties);
+    const methods = Definition.getMethods(definition);
 
     //loop through interface methods
-    Helper.forEach(methods, method => {
-      //ignore constructor
-      if (method === 'constructor') {
-        return;
-      }
-
-      if (!Definition.isImplemented(
-        properties[method],
-        this.properties
-      )) {
+    Object.keys(methods).forEach(method => {
+      if (!isImplemented(method, methods[method], this.methods)) {
+        const name = this.definition.name;
         //throw an exception
-        throw Exception.for(
-          'Class %s did not implement %s',
-          this.definition.name,
-          method
-        );
+        throw Exception.for('Class %s did not implement %s', name, method);
       }
     });
 
@@ -60,6 +47,11 @@ class Definition {
 
   /**
    * Checks to see if the class definition implements the given interface/s
+   *
+   * NOTE: There is an NPM bug where its possible that the exact same class
+   *       in the exact same package can be defined in two packages as
+   *       sub-packages. Therefore we should not trust the native instanceof
+   *       for custom objects while using NPM.
    *
    * @param {Object} [...definitions]
    *
@@ -92,81 +84,28 @@ class Definition {
    */
   uses(definition) {
     if (arguments.length > 1) {
-      Helper.forEach(Array.from(arguments), definition => {
+      Array.from(arguments).forEach(definition => {
         this.uses(definition);
       });
 
       return this;
     }
 
-    const properties = Definition.getPrototype(definition);
-    const methods = Object.getOwnPropertyNames(properties);
+    const methods = Definition.getMethods(definition);
 
     //loop through interface methods
-    Helper.forEach(methods, method => {
-      //ignore constructor
-      if (method === 'constructor') {
+    Object.keys(methods).forEach(method => {
+      //if it's implemented
+      if (isImplemented(method, methods[method], this.methods)) {
         return;
       }
 
-      if (!Definition.isImplemented(
-        properties[method],
-        this.properties
-      )) {
-        //implement it
-        this.properties[method] = properties[method];
-      }
+      //implement it
+      implement(method, methods[method], this.definition);
+      this.methods = Definition.getMethods(this.definition);
     });
 
     return this;
-  }
-
-  /**
-   * Returns true if the given method is implemented in the definition
-   *
-   * @param {Function} method
-   * @param {Object} definition
-   *
-   * @return {Boolean}
-   */
-  static isImplemented(method, definition) {
-    const name = method.name;
-    if (typeof definition[name] === 'undefined') {
-      return false;
-    }
-
-    const interfaceClause = Definition.getArgumentClause(method);
-    const definitionClause = Definition.getArgumentClause(definition[name]);
-
-    if (interfaceClause !== definitionClause) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Returns the argument clause of a function
-   *
-   * @param {Object} callback
-   *
-   * @return {Boolean}
-   */
-  static getArgumentClause(callback) {
-    if (typeof callback !== 'function') {
-      return false;
-    }
-
-    const code = callback.toString();
-
-    const start = code.indexOf('(');
-    const end = code.indexOf(')');
-
-    if (start === -1 || end === -1 || !(start < end)) {
-      return false;
-    }
-
-    return code.substr(start + 1, end - start - 1);
   }
 
   /**
@@ -174,14 +113,121 @@ class Definition {
    *
    * @param {Object} definition
    */
-  static getPrototype(definition) {
-    let prototype = definition;
-    if (typeof definition === 'function') {
-      prototype = definition.prototype || {};
+  static getMethods(definition) {
+    const prototype = {};
+    if (!definition) {
+      return prototype;
     }
 
-    return prototype;
+    if (typeof definition === 'function') {
+      //i found that this is possible...
+      if (!definition.prototype) {
+        definition.prototype = {};
+      }
+
+      definition = definition.prototype;
+    }
+
+    Object.getOwnPropertyNames(definition).forEach(property => {
+      if(Definition.nativeMethods.indexOf(property) !== -1) {
+        return;
+      }
+
+      if (typeof definition[property] === 'function') {
+        prototype[property] = definition[property];
+      }
+    });
+
+    return Object.assign(prototype, Definition.getMethods(
+      Object.getPrototypeOf(definition)
+    ));
   }
+}
+
+/**
+ * Methods which should not be considered as custom methods
+ */
+Definition.nativeMethods = [
+  'constructor',
+  '__defineGetter__',
+  '__defineSetter__',
+  'hasOwnProperty',
+  '__lookupGetter__',
+  '__lookupSetter__',
+  'isPrototypeOf',
+  'propertyIsEnumerable',
+  'toString',
+  'valueOf',
+  'toLocaleString'
+];
+
+/**
+ * Adds a method to the definition
+ *
+ * @param {String} name
+ * @param {Function} method
+ * @param {Object} definition
+ */
+function implement(name, method, definition) {
+  let prototype = definition;
+  if (typeof definition === 'function') {
+    //i found that this is possible...
+    if (!definition.prototype) {
+      definition.prototype = {};
+    }
+
+    prototype = definition.prototype;
+  }
+
+  prototype[name] = method;
+}
+
+/**
+ * Returns true if the given method is implemented in the definition
+ *
+ * @param {String} name
+ * @param {Function} method
+ * @param {Object} definition
+ *
+ * @return {Boolean}
+ */
+function isImplemented(name, method, definition) {
+  if (typeof definition[name] === 'undefined') {
+    return false;
+  }
+
+  const interfaceClause = getArgumentClause(method);
+  const definitionClause = getArgumentClause(definition[name]);
+
+  if (interfaceClause !== definitionClause) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Returns the argument clause of a function
+ *
+ * @param {Object} callback
+ *
+ * @return {Boolean}
+ */
+function getArgumentClause(callback) {
+  if (typeof callback !== 'function') {
+    return false;
+  }
+
+  const code = callback.toString();
+
+  const start = code.indexOf('(');
+  const end = code.indexOf(')');
+
+  if (start === -1 || end === -1 || !(start < end)) {
+    return false;
+  }
+
+  return code.substr(start + 1, end - start - 1);
 }
 
 //adapter
