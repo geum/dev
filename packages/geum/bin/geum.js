@@ -26,6 +26,18 @@ router.on('request', (req, res) => {
   req.set('route', 'pwd', pwd);
 });
 
+router.on('response', (req, res) => {
+  if (req.getStage('output') === 'boundary') {
+    Terminal.output('-----------------------------boundary');
+    Terminal.output(JSON.stringify(res.get('json')));
+    Terminal.output('-----------------------------boundary--');
+  } else if (req.getStage('output') === 'pretty') {
+    Terminal.output(JSON.stringify(res.get('json'), null, 4));
+  } else if (req.getStage('o') || req.getStage('output')) {
+    Terminal.output(JSON.stringify(res.get('json')));
+  }
+});
+
 (() => {
   if (!fs.existsSync(pwd + '/package.json')) {
     return;
@@ -41,11 +53,11 @@ router.on('request', (req, res) => {
   }
 
   package.geum.commands.forEach((file) => {
-    if (file.strpos('./') === 0) {
+    if (file.indexOf('./') === 0) {
       file = file.substr(2);
     }
 
-    if (file.strpos('/') !== 0) {
+    if (file.indexOf('/') !== 0) {
       file = pwd + '/' + file;
     }
 
@@ -58,12 +70,14 @@ router.on('request', (req, res) => {
   });
 })();
 
-//get the route
-const route = router.route(event);
+(async () => {
+  //get the route
+  const route = router.route(event);
 
-//the the args and parameters
-route.args = args;
-route.parameters = parameters;
+  //the the args and parameters
+  route.args = args;
+  route.parameters = parameters;
 
-//run it
-route.emit();
+  //run it
+  await route.emit();
+})()
