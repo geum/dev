@@ -44,7 +44,7 @@ class Router extends CoreRouter {
       //loop through each argument as callback
       Array.from(arguments).forEach((callback, index) => {
         //if the callback is an array
-        if (callback instanceof Array) {
+        if (Array.isArray(callback)) {
           //recall use()
           this.use(...callback);
           return;
@@ -68,7 +68,7 @@ class Router extends CoreRouter {
     }
 
     //if the callback is an EventEmitter
-    if (callback instanceof EventEmitter) {
+    if (Definition(callback).instanceOf(EventEmitter)) {
       Object.keys(callback.listeners).forEach(event => {
         this.on(event, (...args) => {
           callback.emit(event, ...args);

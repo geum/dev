@@ -40,7 +40,7 @@ const addMethod = (method) => {
  */
 function route(router, method, path, callback, priority = 0) {
   //if callback is an array
-  if (callback instanceof Array) {
+  if (Array.isArray(callback)) {
     //expand and recall
     callback.forEach(callback => {
       route(router, method, callback, priority);

@@ -97,7 +97,7 @@ class ServerTrait {
       path = path.split('/');
     }
 
-    if (path instanceof Array) {
+    if (Array.isArray(path)) {
       array = path;
       path = path.join('/');
     }
