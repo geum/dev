@@ -1,4 +1,4 @@
-const Defintion = require('../src/Definition');
+const { Definition } = require('../src');
 
 class BarInterface { bar() {} }
 class FooInterface extends BarInterface { zoo() {} }
@@ -11,7 +11,7 @@ test('traits and interface test', async () => {
   let valid = true;
 
   try {
-    Defintion(Bar1)
+    Definition(Bar1)
       .uses(ZooTrait)
       .implements(FooInterface);
   } catch(e) {
@@ -23,7 +23,7 @@ test('traits and interface test', async () => {
   valid = true;
 
   try {
-    Defintion(Bar2).implements(FooInterface);
+    Definition(Bar2).implements(FooInterface);
   } catch(e) {
     valid = false;
   }
@@ -33,7 +33,7 @@ test('traits and interface test', async () => {
   valid = true;
 
   try {
-    Defintion(ZooTrait).implements(FooInterface);
+    Definition(ZooTrait).implements(FooInterface);
   } catch(e) {
     valid = false;
   }
@@ -42,19 +42,24 @@ test('traits and interface test', async () => {
 })
 
 test('instanceof test', async () => {
-  expect(Defintion(Bar1).instanceOf(Bar2)).toBe(true);
+  expect(Definition(Bar1).instanceOf(Bar2)).toBe(true);
 
   const bar1 = new Bar1();
   const bar2 = new Bar2();
 
-  expect(Defintion(bar1).instanceOf(Bar1)).toBe(true);
-  expect(Defintion(bar2).instanceOf(Bar2)).toBe(true);
-  expect(Defintion(bar1).instanceOf(Bar2)).toBe(true);
-  expect(Defintion(bar1).instanceOf(Array)).toBe(false);
+  expect(Definition(bar1).instanceOf(Bar1)).toBe(true);
+  expect(Definition(bar2).instanceOf(Bar2)).toBe(true);
+  expect(Definition(bar1).instanceOf(Bar2)).toBe(true);
+  expect(Definition(bar1).instanceOf(Array)).toBe(false);
 
-  expect(Defintion(bar2).instanceOf(Bar1)).toBe(false);
+  expect(Definition(bar2).instanceOf(Bar1)).toBe(false);
 
   bar2.zoo = function zoo() {};
 
-  expect(Defintion(bar2).instanceOf(Bar1)).toBe(true);
+  expect(Definition(bar2).instanceOf(Bar1)).toBe(true);
+})
+
+test('getMethods test', async () => {
+  expect(Object.keys(Definition.getMethods(Bar1)).length).toBe(2)
+  expect(Object.keys(Definition.getMethods(Bar2)).length).toBe(1)
 })

@@ -12,6 +12,20 @@ const Router = require('../Router');
 
 class Route {
   /**
+   * @const STATUS_404
+   */
+  static get STATUS_404() {
+    return '404 Not Found';
+  }
+
+  /**
+   * @const STATUS_500
+   */
+  static get STATUS_500() {
+    return '500 Server Error';
+  }
+
+  /**
    * Route Loader
    *
    * @param {RouterInterface} router
@@ -163,7 +177,7 @@ async function dispatch(router, request, response) {
     status = await router.emit('response', request, response);
   } catch(error) {
     //if there is an error
-    response.setStatus(500, Router.STATUS_500);
+    response.setStatus(500, Route.STATUS_500);
     status = await router.emit('error', error, request, response);
   }
 
@@ -188,7 +202,7 @@ async function prepare(router, request, response) {
     status = await router.emit('request', request, response);
   } catch(error) {
     //if there is an error
-    response.setStatus(500, Router.STATUS_500);
+    response.setStatus(500, Route.STATUS_500);
     status = await router.emit('error', error, request, response);
   }
 
@@ -216,7 +230,7 @@ async function process(router, request, response) {
     status = await router.emit(event, request, response);
   } catch(error) {
     //if there is an error
-    response.setStatus(500, Router.STATUS_500);
+    response.setStatus(500, Route.STATUS_500);
     status = await router.emit('error', error, request, response);
   }
 
@@ -230,8 +244,8 @@ async function process(router, request, response) {
   //check for content
   //check for redirect
   if (!response.hasContent() && !response.hasJson()) {
-    response.setStatus(404, Router.STATUS_404);
-    error = new Exception(Router.STATUS_404, 404);
+    response.setStatus(404, Route.STATUS_404);
+    error = new Exception(Route.STATUS_404, 404);
     status = await router.emit('error', error, request, response);
   }
 
