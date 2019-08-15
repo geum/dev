@@ -246,6 +246,7 @@ async function process(router, request, response) {
   if (!response.hasContent() && !response.hasJson()) {
     response.setStatus(404, Route.STATUS_404);
     error = new Exception(Route.STATUS_404, 404);
+    error.errors.event = event;
     status = await router.emit('error', error, request, response);
   }
 

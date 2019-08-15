@@ -122,3 +122,24 @@ test('event nesting', async () => {
 
   await emitter.emit('on something', 1);
 });
+
+test('event regexp', async () => {
+  const emitter = EventEmitter.load();
+
+  let triggered = 0;
+  emitter.on('/^GET\\s\\/components\\/(.*)\\/*$/', async x => {
+    expect(emitter.meta.event).toBe('GET /components/heyo/beans');
+    triggered ++
+    expect(emitter.meta.variables[0]).toBe('heyo/beans')
+  });
+
+  emitter.on(/^GET\s\/components\/(.*)\/*$/, async x => {
+    expect(emitter.meta.event).toBe('GET /components/heyo/beans');
+    triggered ++
+    expect(emitter.meta.variables[0]).toBe('heyo/beans')
+  });
+
+  await emitter.emit('GET /components/heyo/beans', 1);
+
+  expect(triggered).toBe(2)
+});
