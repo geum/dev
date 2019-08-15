@@ -58,8 +58,10 @@ function route(router, method, path, callback, priority = 0) {
 
   const keys = path.match(/(\:[a-zA-Z0-9\-_]+)|(\*\*)|(\*)/g) || [];
 
+  //replace / with \/
+  let regex = path.replace(/\//g, '\\/');
   //replace the :variable-_name01
-  let regex = path.replace(/(\:[a-zA-Z0-9\-_]+)/g, '*');
+  regex = path.replace(/(\:[a-zA-Z0-9\-_]+)/g, '*');
   //replace the stars
   //* -> ([^/]+)
   regex = regex.replace(/\*/g, '([^/]+)');

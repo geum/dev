@@ -1,3 +1,5 @@
+const mime = require('mime');
+
 const { Definition } = require('@geum/core');
 
 const Router = require('./Router');
@@ -47,3 +49,4 @@ module.exports.Route = Route;
 module.exports.Request = Request;
 module.exports.Response = Response;
 module.exports.Map = map;
+module.exports.mime = mime;

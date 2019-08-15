@@ -15,6 +15,22 @@ class Response extends CoreResponse {
   static load(data = {}) {
     return new Response(data);
   }
+
+  /**
+   * Redirects out to the given path
+   *
+   * @param {String} path
+   * @param {Integer} [code = 302]
+   * @param {Boolean} [emulate = false]
+   *
+   * @param {Boolean}
+   */
+  redirect(path, code = 302, emulate = false) {
+    this.setHeader('Location', path);
+    this.set('code', code);
+    this.setContent('Redirecting...');
+    return emulate;
+  }
 }
 
 //definition check

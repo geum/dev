@@ -11,7 +11,7 @@ test('server test', async() => {
     res.setContent('Hello from /some/path');
   });
 
-  app.post('/some/path', (req, res) => {
+  app.post(['/some/path', '/some/path/2'], (req, res) => {
     res.setContent('Hello again from /some/path');
   });
 
@@ -97,6 +97,37 @@ test('router test', async() => {
   expect(await response.text()).toBe('Hello :name from /some/path');
 });
 
+test('re-routing test', async() => {
+  const app = geum();
+  const router = geum.Router.load();
+
+  //make some routes
+  router.route('/some/path').get(async(req, res) => {
+    req.setStage('x', 1);
+    await router.routeTo('get', '/some/other/path', req, res);
+    res.setContent(req.getStage('x'));
+  });
+
+  router.get('/some/other/path', (req, res) => {
+    req.setStage('x', 2);
+  });
+
+  app.use(router);
+
+  //default
+  const server = http.createServer(app);
+
+  //as soon as the server is called and responded, close the server
+  app.on('close', () => { server.close() });
+
+  //listen to server
+  server.listen(3000);
+
+  const response = await fetch('http://127.0.0.1:3000/some/path?lets=dothis');
+
+  expect(await response.text()).toBe('2');
+});
+
 test('static file test', async() => {
   const app = geum();
 
@@ -118,4 +149,28 @@ test('static file test', async() => {
   const response = await fetch('http://127.0.0.1:3000/note.txt');
   const text = await response.text();
   expect(text.trim()).toBe('This is a note.');
+});
+
+test('path test', async() => {
+  const app = geum();
+
+  //make some routes
+  app.route('/components/**').get(async(req, res) => {
+    expect(req.get('path', 'array').length).toBe(4)
+    res.setHeader('Content-Type', 'text/plain');
+    res.setContent('in');
+  });
+
+  //default
+  const server = http.createServer(app);
+
+  //as soon as the server is called and responded, close the server
+  app.on('close', () => { server.close() });
+
+  //listen to server
+  server.listen(3000);
+
+  const response = await fetch('http://127.0.0.1:3000/components/some/path.txt');
+  const text = await response.text();
+  expect(text.trim()).toBe('in');
 });

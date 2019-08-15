@@ -1,3 +1,6 @@
+const fs = require('fs');
+const mime = require('mime');
+
 const { Definition, EventEmitter, Router: CoreRouter } = require('@geum/core');
 
 const MethodTrait = require('./router/MethodTrait');
@@ -84,6 +87,49 @@ class Router extends CoreRouter {
     }
 
     return this;
+  }
+
+  /**
+   * Opens up an entire folder
+   *
+   * @param {String} root
+   * @param {String} [publicPath = '']
+   *
+   * @return {Router}
+   */
+  public(root, publicPath = '') {
+    const pattern = (publicPath + '/**').replace(/\/\//g, '/');
+    return this.all(pattern, (req, res) => {
+      if (res.hasContent()) {
+        return;
+      }
+
+      let path = req.get('path', 'string').substr(publicPath.length);
+
+      //if it doesnt exist
+      if (!fs.existsSync(root + path) || !fs.lstatSync(root + path).isFile()) {
+        return;
+      }
+
+      res.setHeader('Content-Type', mime.getType(root + path));
+      res.setContent(fs.createReadStream(root + path));
+
+      return false;
+    }, 10000);
+  }
+
+  /**
+   * Runs an event like a method
+   *
+   * @param {String} event
+   * @param {Request} [request = null]
+   * @param {Response} [response = null]
+   *
+   * @return {Integer}
+   */
+  async routeTo(method, path, request = null, response = null) {
+    const event = method.toUpperCase() + ' ' + path;
+    return await this.emit(event, request, response);
   }
 }
 

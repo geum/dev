@@ -9,6 +9,9 @@ process.on('unhandledRejection', (reason, p) => {
 
 const app = geum();
 
+app.public(__dirname + '/assets', '/assets');
+app.public(__dirname + '/public');
+
 //make some routes
 app.route('/some/path').get((req, res) => {
   res.setContent(
@@ -27,6 +30,10 @@ app.post('/some/path', (req, res) => {
 app.post('/:category/:name', (req, res) => {
   res.setError(true, 'Something went wrong');
   res.setContent('Hello :name from /some/path');
+});
+
+app.get('/redirect', (req, res) => {
+  return res.redirect('/some/path');
 });
 
 app.route('/note.txt').get(async(req, res) => {

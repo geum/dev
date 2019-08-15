@@ -68,7 +68,7 @@ module.exports = {
     //else if theres content
     } else if (response.hasContent()) {
       //manually write the content
-      serverResponse.write(response.getContent());
+      serverResponse.write(String(response.getContent()));
       //and close the connection
       serverResponse.end();
     }
