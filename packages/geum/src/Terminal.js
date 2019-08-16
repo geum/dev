@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
+const { Router } = require('@geum/core');
 
-class Terminal {
+class Terminal extends Router {
   /**
    * Transforms array args to object
    *
@@ -114,6 +115,13 @@ class Terminal {
     }
 
     return answers;
+  }
+
+  /**
+   * Terminal Loader
+   */
+  static load() {
+    return new Terminal();
   }
 
   /**

@@ -19,7 +19,10 @@ const {
 
 const Http = require('@geum/http');
 const Socket = require('@geum/socket');
+
+const Application = require('./Application');
 const Terminal = require('./Terminal');
+const app = Application.load();
 
 module.exports = {
   EventInterface,
@@ -43,5 +46,8 @@ module.exports = {
 
   Http,
   Socket,
-  Terminal
+
+  Application,
+  Terminal,
+  app
 };
