@@ -4,7 +4,7 @@ const Terminal = require('./Terminal');
 const commands = EventEmitter.load();
 
 commands.on('version', async(req, res) => {
-  const config = require('../../package.json');
+  const config = require('../package.json');
   req.setStage('o', true);
   res.setResults(config.version);
 });
