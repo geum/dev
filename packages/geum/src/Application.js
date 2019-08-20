@@ -1,12 +1,19 @@
 const fs = require('fs');
-var path = require('path');
+const path = require('path');
 
-const { EventEmitter } = require('@geum/core');
+const { Definition, EventEmitter, Registry, Exception } = require('@geum/core');
 const Http = require('@geum/http');
 const Socket = require('@geum/socket');
 const Terminal = require('./Terminal');
 
 class Application extends EventEmitter {
+  /**
+   * @var {String} pwd - Present Working Directory
+   */
+  get pwd() {
+    return this.data.pwd;
+  }
+
   /**
    * @var {Http} server - Lazy loaded http server
    */
@@ -64,8 +71,10 @@ class Application extends EventEmitter {
    */
   constructor() {
     super();
-    this.pwd = process.env.PWD;
+    //for adapters
     this.services = {};
+    //for registry
+    this.data = { pwd: process.env.PWD };
   }
 
   /**
@@ -167,5 +176,8 @@ function getAbsolutePath(file, root) {
 
   return file;
 }
+
+//definition check
+Definition(Application).uses(Registry);
 
 module.exports = Application;
