@@ -1,6 +1,6 @@
 {
   "name": "@geum/socket",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Event driven Socket framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
@@ -17,8 +17,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@geum/core": "^0.0.18",
-    "@geum/http": "^0.0.15"
+    "@geum/core": "^0.0.19",
+    "@geum/http": "^0.0.16"
   },
   "devDependencies": {
     "jest": "^24.5.0",
