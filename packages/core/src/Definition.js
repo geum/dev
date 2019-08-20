@@ -133,8 +133,17 @@ class Definition {
         return;
       }
 
-      if (typeof definition[property] === 'function') {
+      const descriptor = Object.getOwnPropertyDescriptor(definition, property);
+
+      if (typeof descriptor.value === 'function') {
         prototype[property] = definition[property];
+        return;
+      }
+
+      if (typeof descriptor.get === 'function'
+        || typeof descriptor.set === 'function'
+      ) {
+        Object.defineProperty(prototype, property, descriptor);
       }
     });
 
@@ -149,6 +158,7 @@ class Definition {
  */
 Definition.nativeMethods = [
   'constructor',
+  '__proto__',
   '__defineGetter__',
   '__defineSetter__',
   'hasOwnProperty',
