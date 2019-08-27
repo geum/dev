@@ -1,0 +1,37 @@
+{
+  "name": "@geum/react",
+  "version": "0.0.1",
+  "description": "Event driven React framework",
+  "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
+  "license": "MIT",
+  "homepage": "https://github.com/geum/react#readme",
+  "bugs": {
+    "url": "https://github.com/geum/react/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geum/react.git"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.5.5",
+    "@geum/core": "^0.0.19",
+    "@geum/http": "^0.0.17",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
+  },
+  "devDependencies": {
+    "@babel/polyfill": "^7.4.4",
+    "jest": "^24.5.0",
+    "node-fetch": "^2.6.0",
+    "redux": "^3.3.1",
+    "hookrouter": "^1.2.3",
+    "react-redux": "^4.4.1",
+    "react-router": "^5.0.1",
+    "react-router-dom": "^5.0.1"
+  }
+}
