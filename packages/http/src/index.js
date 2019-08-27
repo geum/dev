@@ -14,7 +14,7 @@ module.exports = () => {
     await Server.emit('open', request, response);
 
     //make a payload
-    const payload = await map.makePayload(request, response);
+    const payload = await map.makePayload(request, response, Request, Response);
     const method = payload.request.getMethod();
     const path = payload.request.getPath('string');
 

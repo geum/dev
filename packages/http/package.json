@@ -1,6 +1,6 @@
 {
   "name": "@geum/http",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Event driven HTTP framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",

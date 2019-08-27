@@ -4,13 +4,10 @@ const cookie = require('cookie');
 
 const { Registry } = require('@geum/core');
 
-const Request = require('../router/Request');
-const Response = require('../router/Response');
-
 module.exports = {
-  async makePayload(incomingMessage, serverResponse) {
-    const request = await makeRequest(incomingMessage);
-    const response = makeResponse(request, serverResponse);
+  async makePayload(incomingMessage, serverResponse, Request, Response) {
+    const request = await makeRequest(incomingMessage, Request);
+    const response = makeResponse(request, serverResponse, Response);
 
     return { request, response };
   },
@@ -75,7 +72,7 @@ module.exports = {
   }
 };
 
-async function makeRequest(incomingMessage) {
+async function makeRequest(incomingMessage, Request) {
   const request = Request.load({
     headers: {},
     get: {},
@@ -100,7 +97,7 @@ async function makeRequest(incomingMessage) {
   return request;
 }
 
-function makeResponse(request, serverResponse) {
+function makeResponse(request, serverResponse, Response) {
   const response = Response.load({
     headers: {},
     body: '',
