@@ -4,6 +4,7 @@ const path = require('path');
 const { Definition, EventEmitter, Registry, Exception } = require('@geum/core');
 const Http = require('@geum/http');
 const Socket = require('@geum/socket');
+const React = require('@geum/react');
 const Terminal = require('./Terminal');
 
 class Application extends EventEmitter {
@@ -12,6 +13,22 @@ class Application extends EventEmitter {
    */
   get pwd() {
     return this.data.pwd;
+  }
+
+  /**
+   * @var {Http} server - Lazy loaded http server
+   */
+  get react() {
+    if (!this.services.react) {
+      this.services.react = React();
+
+      //chain the errors
+      this.services.react.on('error', async(...args) => {
+        await this.emit('error', ...args);
+      });
+    }
+
+    return this.services.react;
   }
 
   /**

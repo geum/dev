@@ -1,6 +1,6 @@
 {
   "name": "geum",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Event driven Application",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@geum/core": "^0.0.19",
-    "@geum/http": "^0.0.16",
+    "@geum/http": "^0.0.17",
+    "@geum/react": "^0.0.1",
     "@geum/socket": "0.0.5",
     "cookie-parser": "^1.4.4",
     "express-session": "^1.16.2",
