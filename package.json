@@ -1,0 +1,22 @@
+{
+  "name": "geum-dev",
+  "version": "0.0.1",
+  "description": "Mono repo for development",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geum/dev.git"
+  },
+  "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/geum/dev/issues"
+  },
+  "homepage": "https://github.com/geum/dev#readme",
+  "devDependencies": {
+    "lerna": "^3.16.4"
+  }
+}
