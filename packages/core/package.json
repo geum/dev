@@ -1,6 +1,6 @@
 {
   "name": "@geum/core",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Event driven core framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
@@ -16,7 +16,6 @@
   "scripts": {
     "test": "jest"
   },
-  "dependencies": {},
   "devDependencies": {
     "jest": "^24.5.0",
     "node-fetch": "^2.6.0"
