@@ -1,10 +1,12 @@
 {
-  "name": "geum-dev",
+  "name": "geum",
   "version": "0.0.1",
   "description": "Mono repo for development",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "bootstrap": "lerna bootstrap",
+    "publish": "lerna publish"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,7 @@
   },
   "homepage": "https://github.com/geum/dev#readme",
   "devDependencies": {
+    "jest": "^24.9.0",
     "lerna": "^3.16.4"
   }
 }
