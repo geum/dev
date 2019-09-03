@@ -28,9 +28,12 @@
   "devDependencies": {
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
     "@geum/http": "^0.0.22",
     "@geum/webpack": "^0.0.22",
     "jest": "^24.5.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "webpack-dev-middleware": "^3.7.0",
+    "webpack-hot-middleware": "^2.25.0"
   }
 }
