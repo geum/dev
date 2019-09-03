@@ -1,6 +1,6 @@
 {
   "name": "@geum/react",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Event driven React framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
@@ -19,9 +19,9 @@
     "test": "jest"
   },
   "dependencies": {
-    "@geum/browser": "^0.0.22",
-    "@geum/core": "^0.0.22",
-    "@geum/http": "^0.0.22",
+    "@geum/browser": "^0.0.23",
+    "@geum/core": "^0.0.23",
+    "@geum/http": "^0.0.23",
     "react": "^16.9.0"
   },
   "devDependencies": {
@@ -29,7 +29,7 @@
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.5.5",
-    "@geum/webpack": "^0.0.22",
+    "@geum/webpack": "^0.0.23",
     "babel-loader": "^8.0.6",
     "history": "^4.9.0",
     "jest": "^24.5.0",
