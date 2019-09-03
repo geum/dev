@@ -1,15 +1,33 @@
 //this is needed for testing, which allows JSX to be transpiled on the server
 require('@babel/polyfill');
+
 const http = require('http');
 const fetch = require('node-fetch');
 
-const React = require('../src/index');
-const { Router, Request, Response } = React;
+const React = require('react');
+const { renderToString } = require('react-dom/server');
+
+const react = require('../src/index');
+const geum = require('@geum/http');
 
 const Header = require('./assets/Header.jsx');
+const Header2 = require('./assets/Header2.jsx');
+
+test('create element understanding test', async() => {
+  //header is an element
+  let actual = renderToString(React.createElement('div', {}, Header));
+  expect(actual.indexOf('h1') !== -1).toBe(true);
+  expect(actual.indexOf('Hello World') !== -1).toBe(true);
+
+  //header is a component
+  actual = renderToString(React.createElement(Header2, {}));
+  expect(actual.indexOf('h1') !== -1).toBe(true);
+  expect(actual.indexOf('Hello World') !== -1).toBe(true);
+});
 
 test('http test', async() => {
-  const app = React();
+  const app = geum();
+  app.use(react());
 
   //make some routes
   app.route('/some/path').post((req, res) => {
