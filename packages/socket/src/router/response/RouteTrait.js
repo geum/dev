@@ -1,5 +1,33 @@
 class RouteTrait {
   /**
+   * @var {Array} args
+   */
+  get args() {
+    return this.getArgs();
+  }
+
+  /**
+   * @var {Object} parameters
+   */
+  get parameters() {
+    return this.getParameters();
+  }
+
+  /**
+   * @var {Object} route
+   */
+  get route() {
+    return this.getRoute();
+  }
+
+  /**
+   * @var {String} channel - Sets channel
+   */
+  set channel(channel) {
+    this.setChannel(channel);
+  }
+
+  /**
    * Returns route data given name or all route data
    *
    * @param {Integer} [index=null] The variable index
@@ -12,6 +40,15 @@ class RouteTrait {
     }
 
     return this.getRoute('args', index);
+  }
+
+  /**
+   * Returns final input stream
+   *
+   * @return {String}
+   */
+  getChannel() {
+    return this.get('route', 'channel');
   }
 
   /**
@@ -43,6 +80,15 @@ class RouteTrait {
     }
 
     return this.get('route', name, ...args);
+  }
+
+  /**
+   * Returns true if has channel
+   *
+   * @return {Boolean}
+   */
+  hasChannel() {
+    return this.has('route', 'channel');
   }
 
   /**

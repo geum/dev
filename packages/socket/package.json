@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@geum/core": "^0.0.20",
-    "@geum/http": "^0.0.16"
+    "@geum/http": "^0.0.20"
   },
   "devDependencies": {
     "jest": "^24.5.0",

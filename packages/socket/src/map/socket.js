@@ -1,7 +1,7 @@
-const { Map } = require('@geum/http');
+const { map } = require('@geum/http');
 
 module.exports = {
-  async makePayload(incomingMessage, serverResponse) {
+  async payload(Router, incomingMessage, serverResponse) {
     if (incomingMessage.headers.referer) {
       const url = new URL(incomingMessage.headers.referer);
       //LEGEND:
@@ -18,11 +18,10 @@ module.exports = {
       incomingMessage.url = url.pathname + url.search;
     }
 
-    return await Map.makePayload(incomingMessage, serverResponse);
+    return await map.payload(Router, incomingMessage, serverResponse);
   },
 
-  dispatcher(request, response) {
-
+  dispatch(request, response) {
     const route = response.getRoute();
     let socket = route.socket;
     // SOCKET LEGEND:

@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/message/create', async(req, res) => {
-  await events.trigger('message-create', req, res);
+  await events.emit('message-create', req, res);
 });
 
 router.route('/socketio').get(async(req, res) => {
