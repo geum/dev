@@ -1,5 +1,12 @@
 class StatusTrait {
   /**
+   * @var {Number} status
+   */
+  get status() {
+    return this.getStatus();
+  }
+
+  /**
    * Returns the status code
    *
    * @return {Number}

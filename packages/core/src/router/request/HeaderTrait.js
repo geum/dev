@@ -1,5 +1,12 @@
 class HeaderTrait {
   /**
+   * @var {Object} headers
+   */
+  get headers() {
+    return this.getHeader();
+  }
+
+  /**
    * Returns _HEADERS given name or all _HEADERS
    *
    * @param {String} [name = null]
@@ -23,29 +30,6 @@ class HeaderTrait {
    */
   hasHeader(name) {
     return this.has('headers', name);
-  }
-
-  /**
-   * Removes _HEADERS
-   *
-   * @param {String} name
-   *
-   * @return {HeaderTrait}
-   */
-  removeHeader(name) {
-    return this.remove('headers', name);
-  }
-
-  /**
-   * Sets _HEADERS
-   *
-   * @param {String} name
-   * @param {String} [value = null]
-   *
-   * @return {HeaderTrait}
-   */
-  setHeader(name, value = null) {
-    return this.set('headers', name, value);
   }
 }
 

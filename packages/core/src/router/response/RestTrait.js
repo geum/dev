@@ -1,5 +1,54 @@
 class RestTrait {
   /**
+   * @var {Object} results
+   */
+  get results() {
+    return this.getResults();
+  }
+
+  /**
+   * @var {String} message
+   */
+  get message() {
+    return this.getMessage();
+  }
+
+  /**
+   * @var {String} results
+   */
+  set results(results) {
+    this.setResults(results);
+  }
+
+  /**
+   * @var {Boolean} successful
+   */
+  get successful() {
+    return this.isSuccessful();
+  }
+
+  /**
+   * @var {String} messageType
+   */
+  get messageType() {
+    return this.getMessageType();
+  }
+
+  /**
+   * @var {Object} validations
+   */
+  get validations() {
+    return this.getValidation();
+  }
+
+  /**
+   * @var {Object} results
+   */
+  set results(results) {
+    this.setResults(results);
+  }
+
+  /**
    * Adds a JSON validation message or sets all the validations
    *
    * @param {String} field

@@ -94,17 +94,32 @@ test('trigger incomplete event', async () => {
 
 test('trigger unbind event', async () => {
   let emitter = EventEmitter.load();
+  let listener = async x => {
+    triggered.push(1);
+  };
 
   let triggered = [];
-  emitter.on('trigger unbind something', async x => {
-    triggered.push(1);
-  });
+  emitter.on('trigger unbind something', listener);
 
   emitter.unbind('trigger unbind something');
   const actual = await emitter.emit('trigger unbind something');
 
   expect(triggered.length).toBe(0);
   expect(actual).toBe(EventEmitter.STATUS_NOT_FOUND);
+
+  let listener2 = async x => {
+    triggered.push(2);
+  };
+
+  emitter.on('trigger unbind something', listener);
+  emitter.on('trigger unbind something', listener2);
+  emitter.unbind('trigger unbind something', listener);
+
+  const actual2 = await emitter.emit('trigger unbind something');
+
+  expect(triggered.length).toBe(1);
+  expect(triggered[0]).toBe(2);
+  expect(actual2).toBe(EventEmitter.STATUS_OK);
 });
 
 test('event nesting', async () => {
@@ -142,4 +157,45 @@ test('event regexp', async () => {
   await emitter.emit('GET /components/heyo/beans', 1);
 
   expect(triggered).toBe(2)
+});
+
+test('event async', async() => {
+  const emitter = EventEmitter.load();
+
+  const actual = [];
+
+  emitter.on('async test', async() => {
+    actual.push(1)
+  });
+
+  emitter.on('async test', async() => {
+    actual.push(2)
+  });
+
+  emitter.on('async test', async() => {
+    actual.push(3)
+  });
+
+  emitter.emit('async test')
+
+  //something unexpected is that even on async the first listener is syncronous
+  //I concluded that this is just how the async/await works
+  expect(actual.length).toBe(1);
+
+  //
+  const actual2 = [];
+
+  emitter.on('async test 2', (x) => {
+    return {
+      then(callback) {
+        setTimeout(() => {
+          actual2.push(x + 1);
+          callback()
+        }, 100)
+      }
+    }
+  });
+
+  await emitter.emit('async test 2', 1);
+  expect(actual2[0]).toBe(2);
 });

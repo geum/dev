@@ -1,14 +1,14 @@
-const Definition = require('../Definition');
+const Reflection = require('../Reflection');
 const RequestInterface = require('../contracts/RequestInterface');
 const ResponseInterface = require('../contracts/ResponseInterface');
 const RouterInterface = require('../contracts/RouterInterface');
 
-const Request = require('./Request');
-const Response = require('./Response');
-
 const EventEmitter = require('../EventEmitter');
 const Exception = require('../Exception');
 const Router = require('../Router');
+
+const Request = require('./Request');
+const Response = require('./Response');
 
 class Route {
   /**
@@ -75,7 +75,7 @@ class Route {
    * @return {Route}
    */
   set request(request) {
-    if (!Definition(request).instanceOf(RequestInterface)) {
+    if (!Reflection(request).instanceOf(RequestInterface)) {
       throw Exception.forInvalidArgument(0, RequestInterface, request);
     }
 
@@ -90,7 +90,7 @@ class Route {
    * @return {Route}
    */
   set response(response) {
-    if (!Definition(response).instanceOf(ResponseInterface)) {
+    if (!Reflection(response).instanceOf(ResponseInterface)) {
       throw Exception.forInvalidArgument(0, ResponseInterface, response);
     }
 
@@ -106,7 +106,7 @@ class Route {
    * @return {Route}
    */
   constructor(router, event) {
-    if (!Definition(router).instanceOf(RouterInterface)) {
+    if (!Reflection(router).instanceOf(RouterInterface)) {
       throw Exception.forInvalidArgument(0, RouterInterface, router);
     }
 
@@ -131,9 +131,7 @@ class Route {
     const args = this.data.args || [];
     const parameters = this.data.parameters || {};
 
-    request
-      .setStage(parameters)
-      .setRoute({ event, args, parameters });
+    request.setStage(parameters).set('route', { event, args, parameters });
 
     //try to trigger request pre-processors
     if (!await prepare(router, request, response)) {
@@ -157,6 +155,18 @@ class Route {
     //anything else?
 
     return response;
+  }
+
+  /**
+   * When calling await, js looks for a then (to emulate a promise)
+   *
+   * @param {Function} callback
+   *
+   * @return {Route}
+   */
+  then(callback) {
+    this.emit().then(callback);
+    return this;
   }
 }
 
@@ -254,7 +264,9 @@ async function process(router, request, response) {
   return status !== EventEmitter.STATUS_INCOMPLETE;
 }
 
+//allows interfaces to be manually changed
 Route.RequestInterface = Request;
 Route.ResponseInterface = Response;
 
+//adapter
 module.exports = Route;

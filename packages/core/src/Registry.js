@@ -1,4 +1,4 @@
-const Definition = require('./Definition');
+const Reflection = require('./Reflection');
 const RegistryInterface = require('./contracts/RegistryInterface');
 
 /**
@@ -319,7 +319,7 @@ class Registry {
 }
 
 //definition check
-Definition(Registry).implements(RegistryInterface);
+Reflection(Registry).implements(RegistryInterface);
 
 //adapter
 module.exports = Registry;

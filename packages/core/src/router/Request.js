@@ -1,4 +1,4 @@
-const Definition = require('../Definition');
+const Reflection = require('../Reflection');
 const Registry = require('../Registry');
 
 const RequestInterface = require('../contracts/RequestInterface');
@@ -22,7 +22,7 @@ class Request extends Registry {
 }
 
 //definition check
-Definition(Request).uses(
+Reflection(Request).uses(
   ContentTrait,
   HeaderTrait,
   RouteTrait,

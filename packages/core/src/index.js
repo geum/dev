@@ -5,7 +5,7 @@ const RequestInterface = require('./contracts/RequestInterface');
 const ResponseInterface = require('./contracts/ResponseInterface');
 const RouterInterface = require('./contracts/RouterInterface');
 
-const Definition = require('./Definition');
+const Reflection = require('./Reflection');
 const EventEmitter = require('./EventEmitter');
 const Exception = require('./Exception');
 const Helper = require('./Helper');
@@ -25,7 +25,7 @@ module.exports = {
   RequestInterface,
   ResponseInterface,
   RouterInterface,
-  Definition,
+  Reflection,
   EventEmitter,
   Exception,
   Helper,

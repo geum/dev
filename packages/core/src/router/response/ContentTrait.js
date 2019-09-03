@@ -1,5 +1,26 @@
 class ContentTrait {
   /**
+   * @var {String} content
+   */
+  get content() {
+    return this.getContent();
+  }
+
+  /**
+   * @var {Boolean} streamable
+   */
+  get streamable() {
+    return this.isContentStreamable();
+  }
+
+  /**
+   * @var {String} content
+   */
+  set content(content) {
+    this.setContent(content);
+  }
+
+  /**
    * Returns the content body
    *
    * @return {String}
@@ -34,6 +55,21 @@ class ContentTrait {
    * @return {ResponseInterface}
    */
   setContent(content) {
+    //if null
+    if (content === null) {
+      content = '';
+    }
+
+    //if boolean
+    if (typeof content === 'boolean') {
+      content = content ? 1: 0;
+    }
+
+    //if number
+    if (typeof content === 'number') {
+      content = String(content);
+    }
+
     //if it's an array
     if (Array.isArray(content)) {
       content = JSON.stringify(content, null, 2);
@@ -47,12 +83,9 @@ class ContentTrait {
       }
     }
 
-    if (typeof content === 'boolean') {
-      content = content ? '1': '0';
-    }
-
-    if (content === null) {
-      content = '';
+    //if it's a function
+    if (typeof content === 'function') {
+      content = content();
     }
 
     return this.set('body', content);

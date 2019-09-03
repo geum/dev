@@ -1,5 +1,26 @@
 class StageTrait {
   /**
+   * @var {Object} stage
+   */
+  get stage() {
+    return this.getStage();
+  }
+
+  /**
+   * @var {Object} stage
+   */
+  set stage(stage) {
+    this.setStage(stage);
+  }
+
+  /**
+   * @var {Object} softStage
+   */
+  set softStage(stage) {
+    this.setSoftStage(stage);
+  }
+
+  /**
    * Returns _REQUEST given name or all _REQUEST
    *
    * @param {*} [...args]

@@ -1,4 +1,4 @@
-const Definition = require('./Definition');
+const Reflection = require('./Reflection');
 const QueueInterface = require('./contracts/QueueInterface');
 
 /**
@@ -93,6 +93,18 @@ class TaskQueue {
   }
 
   /**
+   * When calling await, js looks for a then (to emulate a promise)
+   *
+   * @param {Function} callback
+   *
+   * @return {TaskQueue}
+   */
+  then(callback) {
+    this.run().then(callback);
+    return this;
+  }
+
+  /**
    * Runs the tasks
    *
    * @param {*} [...args]
@@ -118,7 +130,7 @@ class TaskQueue {
 }
 
 //definition check
-Definition(TaskQueue).implements(QueueInterface);
+Reflection(TaskQueue).implements(QueueInterface);
 
 //adapter
 module.exports = TaskQueue;

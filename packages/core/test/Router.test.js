@@ -37,6 +37,40 @@ test('Router test', async () => {
   expect(res.getMessage()).toBe(2);
 });
 
+test('Payload test', async () => {
+  let router = null, route = null, res = null;
+
+  router = Router.load();
+  router.on('request', (req, res) => {
+    res.setContent('test');
+  });
+  route = router.route('route test')
+  res = await route.emit();
+  expect(res.content).toBe('test');
+
+  router = Router.load();
+  router.on('request', (req, res) => {
+    res.content = 'test';
+  });
+  route = router.route('route test')
+  res = await route.emit();
+  expect(res.getContent()).toBe('test');
+});
+
+test('Legacy middleware test', async () => {
+  const router = Router.load();
+  router.use((req, res, next) => {
+    setTimeout(() => {
+      res.setContent(1);
+      next();
+    }, 100);
+  });
+
+  const res = await router.route('route test');
+
+  expect(res.content).toBe('1')
+});
+
 test('Router request test', async () => {
   const router = Router.load();
 
@@ -97,4 +131,4 @@ test('Router HTTP test', async () => {
   });
 
   expect(await response.text()).toBe('2');
-})
+});

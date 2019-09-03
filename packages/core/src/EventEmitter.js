@@ -1,4 +1,4 @@
-const Definition = require('./Definition');
+const Reflection = require('./Reflection');
 const TaskQueue = require('./TaskQueue');
 
 const EventInterface = require('./contracts/EventInterface');
@@ -241,7 +241,7 @@ class EventEmitter {
     }
 
     // @codeCoverageIgnoreStart
-    return $this;
+    return this;
     // @codeCoverageIgnoreEnd
   }
 }
@@ -250,7 +250,7 @@ class EventEmitter {
 EventEmitter.QueueInterface = TaskQueue;
 
 //definition check
-Definition(EventEmitter).implements(EventInterface);
+Reflection(EventEmitter).implements(EventInterface);
 
 //adapter
 module.exports = EventEmitter;

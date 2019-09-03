@@ -1,4 +1,4 @@
-const Definition = require('../Definition');
+const Reflection = require('../Reflection');
 const Registry = require('../Registry');
 
 const ResponseInterface = require('../contracts/ResponseInterface');
@@ -22,7 +22,7 @@ class Response extends Registry {
 }
 
 //definition check
-Definition(Response).uses(
+Reflection(Response).uses(
   ContentTrait,
   HeaderTrait,
   RestTrait,

@@ -1,5 +1,21 @@
 class HeaderTrait {
   /**
+   * @var {Object} headers
+   */
+  get headers() {
+    return this.getHeader();
+  }
+
+  /**
+   * @var {Object} headers
+   */
+  set headers(headers) {
+    Object.keys(headers).forEach(name => {
+      this.setHeader(name, headers[name]);
+    })
+  }
+
+  /**
    * Returns either the header value given
    * the name or the all headers
    *

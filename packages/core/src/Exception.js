@@ -75,6 +75,34 @@ class Exception {
   }
 
   /**
+   * Expressive return type mismatch
+   *
+   * @param {*} expected
+   * @param {*} value
+   *
+   * @return {Exception}
+   */
+  static forInvalidReturn(expected, actual) {
+    if (typeof expected === 'object') {
+      expected = expected.constructor.name;
+    } else if (typeof expected === 'function') {
+      expected = expected.name;
+    }
+
+    if (typeof actual === 'object') {
+      actual = actual.constructor.name;
+    } else if (typeof actual === 'function') {
+      actual = actual.name;
+    }
+
+    return this.for(
+      'Return value expecting %s, %s was given',
+      expected,
+      actual
+    );
+  }
+
+  /**
    * 404 expressive error
    *
    * @param {String} key

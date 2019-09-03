@@ -1,5 +1,12 @@
 class ContentTrait {
   /**
+   * @var {String} content - Returns final input stream
+   */
+  get content() {
+    return this.getContent();
+  }
+
+  /**
    * Returns final input stream
    *
    * @return {String}
@@ -15,17 +22,6 @@ class ContentTrait {
    */
   hasContent() {
     return this.has('body');
-  }
-
-  /**
-   * Sets content
-   *
-   * @param {String} content
-   *
-   * @return {ContentTrait}
-   */
-  setContent(content) {
-    return this.set('body', content);
   }
 }
 

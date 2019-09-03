@@ -1,5 +1,26 @@
 class RouteTrait {
   /**
+   * @var {Array} args
+   */
+  get args() {
+    return this.getArgs();
+  }
+
+  /**
+   * @var {Object} parameters
+   */
+  get parameters() {
+    return this.getParameters();
+  }
+
+  /**
+   * @var {Object} route
+   */
+  get route() {
+    return this.getRoute();
+  }
+
+  /**
    * Returns route data given name or all route data
    *
    * @param {Integer} [index=null] The variable index
@@ -43,17 +64,6 @@ class RouteTrait {
     }
 
     return this.get('route', name, ...args);
-  }
-
-  /**
-   * Sets a request route
-   *
-   * @param {Array} results
-   *
-   * @return {RouteTrait}
-   */
-  setRoute(route) {
-    return this.set('route', route);
   }
 }
 
