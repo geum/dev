@@ -4,7 +4,6 @@
   "description": "Mono repo for development",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish"
   },
@@ -19,7 +18,6 @@
   },
   "homepage": "https://github.com/geum/dev#readme",
   "devDependencies": {
-    "jest": "^24.9.0",
     "lerna": "^3.16.4"
   }
 }
