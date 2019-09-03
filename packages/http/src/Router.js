@@ -1,7 +1,7 @@
 const fs = require('fs');
 const mime = require('mime');
 
-const { Definition, EventEmitter, Router: CoreRouter } = require('@geum/core');
+const { Reflection, EventEmitter, Router: CoreRouter } = require('@geum/core');
 
 const MethodTrait = require('./router/MethodTrait');
 
@@ -9,7 +9,27 @@ const Route = require('./router/Route');
 const Request = require('./router/Request');
 const Response = require('./router/Response');
 
+const map = require('./map/http');
+
 class Router extends CoreRouter {
+  /**
+   * Used to determine what registration method name to look for when `use()`
+   *
+   * @const {String} USE_METHOD
+   */
+  get USE_METHOD() {
+    return 'http';
+  }
+
+  /**
+   * Used to determine what registration event name to listen to when `use()`
+   *
+   * @const {String} USE_EVENT
+   */
+  get USE_EVENT() {
+    return 'open';
+  }
+
   /**
    * Static loader
    *
@@ -24,69 +44,10 @@ class Router extends CoreRouter {
    */
   constructor() {
     super();
-    this.RouteInterace = Router.RouteInterace;
+
+    this.RouteInterface = Router.RouteInterface;
     this.RequestInterface = Router.RequestInterface;
     this.ResponseInterface = Router.ResponseInterface;
-  }
-
-  /**
-   * Shortcut for middleware
-   *
-   * @param {Function} [callback]
-   * @param {Integer} [priority = 1]
-   *
-   * @return {Framework}
-   */
-  use(callback, priority = 0) {
-    //if priority is not a number ie. EventEmitter, Router, etc.
-    //or there are more than 2 arguments...
-    if (typeof priority !== 'number' || arguments.length > 2) {
-      //set the priority to 0
-      priority = 0;
-
-      //loop through each argument as callback
-      Array.from(arguments).forEach((callback, index) => {
-        //if the callback is an array
-        if (Array.isArray(callback)) {
-          //recall use()
-          this.use(...callback);
-          return;
-        }
-
-        //determine the priority
-        if (typeof arguments[index + 1] === 'number') {
-          priority = arguments[index + 1];
-        }
-
-        //recall use() in a singular way
-        this.use(callback, priority);
-      });
-
-      return this;
-    }
-
-    //make sure priority is a number
-    if (typeof priority !== 'number') {
-      priority = 0;
-    }
-
-    //if the callback is an EventEmitter
-    if (Definition(callback).instanceOf(EventEmitter)) {
-      Object.keys(callback.listeners).forEach(event => {
-        this.on(event, (...args) => {
-          callback.emit(event, ...args);
-        }, priority);
-      });
-
-      return this;
-    }
-
-    //if a callback is not a function
-    if (typeof callback === 'function') {
-      this.on('open', callback, priority);
-    }
-
-    return this;
   }
 
   /**
@@ -108,7 +69,12 @@ class Router extends CoreRouter {
 
       //if it doesnt exist
       if (!fs.existsSync(root + path) || !fs.lstatSync(root + path).isFile()) {
-        return;
+        //add index.html
+        path = (path + '/index.html').replace(/\/\//g, '/');
+        //and try again
+        if (!fs.existsSync(root + path) || !fs.lstatSync(root + path).isFile()) {
+          return;
+        }
       }
 
       res.setHeader('Content-Type', mime.getType(root + path));
@@ -116,6 +82,29 @@ class Router extends CoreRouter {
 
       return false;
     }, 10000);
+  }
+
+  /**
+   * Runs the main routing without dispatching
+   *
+   * @param {Object} incomingMessage
+   * @param {Object} serverResponse
+   *
+   * @return {Response}
+   */
+  async bootstrap(incomingMessage, serverResponse) {
+    //make a payload
+    const payload = await map.payload(this, incomingMessage, serverResponse);
+    const method = payload.request.getMethod();
+    const path = payload.request.getPath('string');
+
+    const route = this.route(
+      method + ' ' + path,
+      payload.request,
+      payload.response
+    );
+
+    return await route.emit();
   }
 
   /**
@@ -133,10 +122,13 @@ class Router extends CoreRouter {
   }
 }
 
-Router.RouteInterace = Route;
+//allows interfaces to be manually changed
+Router.RouteInterface = Route;
 Router.RequestInterface = Request;
 Router.ResponseInterface = Response;
 
-Definition(Router).uses(MethodTrait);
+//definition check
+Reflection(Router).uses(MethodTrait);
 
+//adapter
 module.exports = Router;

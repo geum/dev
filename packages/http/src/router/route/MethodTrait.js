@@ -1,4 +1,4 @@
-const methods = require('../../map/methods');
+const methods = require('../../map/methods.json');
 
 module.exports = {};
 
@@ -26,6 +26,8 @@ const addMethod = (method) => {
 
       route(router, method, path, callback, priority);
     });
+
+    return this;
   };
 };
 
@@ -97,7 +99,7 @@ function route(router, method, path, callback, priority = 0) {
       }
     });
 
-    request.setStage(parameters).setRoute({
+    request.setStage(parameters).set('route', {
       event: name,
       args: variables,
       parameters

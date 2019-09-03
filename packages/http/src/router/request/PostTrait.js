@@ -1,5 +1,12 @@
 class PostTrait {
   /**
+   * @var {Object} post
+   */
+  get post() {
+    return this.getPost();
+  }
+
+  /**
    * Returns _POST given name or all _POST
    *
    * @param {*} [...args]
@@ -19,41 +26,6 @@ class PostTrait {
    */
   hasPost(...args) {
     return this.has('post', ...args);
-  }
-
-  /**
-   * Removes _POST given name or all _POST
-   *
-   * @param {*} [...args]
-   *
-   * @return {PostTrait}
-   */
-  removePost(...args) {
-    return this.remove('post', ...args);
-  }
-
-  /**
-   * Sets _POST
-   *
-   * @param {*} data
-   * @param {*} [...args]
-   *
-   * @return {PostTrait}
-   */
-  setPost(data, ...args) {
-    if (typeof data === 'object') {
-      Object.keys(data).forEach(key => {
-        this.setPost(key, data[key]);
-      });
-
-      return this;
-    }
-
-    if (args.length === 0) {
-      return this;
-    }
-
-    return this.set('post', data, ...args);
   }
 
   /**

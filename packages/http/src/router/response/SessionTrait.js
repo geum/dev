@@ -1,5 +1,19 @@
 class SessionTrait {
   /**
+   * @var {Object} session
+   */
+  get session() {
+    return this.getSession();
+  }
+
+  /**
+   * @var {Object} session
+   */
+  set session(session) {
+    this.setSession(session);
+  }
+
+  /**
    * Returns _SESSION given name or all _SESSION
    *
    * @param {*} [...args]

@@ -1,5 +1,33 @@
 class PageTrait {
   /**
+   * @var {Object} flash
+   */
+  get flash() {
+    return this.getFlash();
+  }
+
+  /**
+   * @var {Object} page
+   */
+  get page() {
+    return this.getPage();
+  }
+
+  /**
+   * @var {Object} page
+   */
+  set page(page) {
+    return this.setPage(page);
+  }
+
+  /**
+   * @var {String} title
+   */
+  set title(title) {
+    return this.setTitle(title);
+  }
+
+  /**
    * Adds a page meta item
    *
    * @param {String} name

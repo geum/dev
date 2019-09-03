@@ -1,5 +1,12 @@
 class SessionTrait {
   /**
+   * @var {Object} session
+   */
+  get session() {
+    return this.getSession();
+  }
+
+  /**
    * Returns _SESSION given name or all _SESSION
    *
    * @param {*} [...args]
@@ -19,41 +26,6 @@ class SessionTrait {
    */
   hasSession(...args) {
     return this.has('session', ...args);
-  }
-
-  /**
-   * Removes _SESSION given name or all _SESSION
-   *
-   * @param {*} [...args]
-   *
-   * @return {SessionTrait}
-   */
-  removeSession(...args) {
-    return this.remove('session', ...args);
-  }
-
-  /**
-   * Sets _SESSION
-   *
-   * @param {*} data
-   * @param {*} [...args]
-   *
-   * @return {SessionTrait}
-   */
-  setSession(data, ...args) {
-    if (typeof data === 'object') {
-      Object.keys(data).forEach(key => {
-        this.setSession(key, data[key]);
-      });
-
-      return this;
-    }
-
-    if (args.length === 0) {
-      return this;
-    }
-
-    return this.set('session', data, ...args);
   }
 }
 

@@ -1,5 +1,12 @@
 class QueryTrait {
   /**
+   * @var {Object} query
+   */
+  get query() {
+    return this.getQuery();
+  }
+
+  /**
    * Returns _GET given name or all _GET
    *
    * @param {*} [...args]
@@ -19,41 +26,6 @@ class QueryTrait {
    */
   hasQuery(...args) {
     return this.has('get', ...args);
-  }
-
-  /**
-   * Removes _GET given name or all _GET
-   *
-   * @param {*} [...args]
-   *
-   * @return {QueryTrait}
-   */
-  removeQuery(...args) {
-    return this.remove('get', ...args);
-  }
-
-  /**
-   * Sets _GET
-   *
-   * @param {*} data
-   * @param {*} [...args]
-   *
-   * @return {QueryTrait}
-   */
-  setQuery(data, ...args) {
-    if (typeof data === 'object') {
-      Object.keys(data).forEach(key => {
-        this.setQuery(key, data[key]);
-      });
-
-      return this;
-    }
-
-    if (args.length === 0) {
-      return this;
-    }
-
-    return this.set('get', data, ...args);
   }
 }
 

@@ -1,39 +1,28 @@
 const mime = require('mime');
 
-const { Definition } = require('@geum/core');
+const { Reflection } = require('@geum/core');
 
 const Router = require('./Router');
-const Route = require('./router/Route');
-const Request = require('./router/Request');
-const Response = require('./router/Response');
 
 const map = require('./map/http');
+const methods = require('./map/methods.json');
 
 module.exports = () => {
-  async function Server(request, response) {
-    await Server.emit('open', request, response);
+  async function Server(incomingMessage, serverResponse) {
+    await Server.emit('open', incomingMessage, serverResponse);
 
-    //make a payload
-    const payload = await map.makePayload(request, response, Request, Response);
-    const method = payload.request.getMethod();
-    const path = payload.request.getPath('string');
+    const response = await Server.bootstrap(incomingMessage, serverResponse);
 
-    const route = Server.route(
-      method + ' ' + path,
-      payload.request,
-      payload.response
-    );
+    map.dispatch(response);
 
-    await route.emit();
+    await Server.emit('close', incomingMessage, serverResponse);
 
-    map.dispatcher(payload.request, payload.response);
-
-    await Server.emit('close', request, response);
+    return response;
   }
 
   //merge router methods
   const router = Router.load();
-  const methods = Definition.getMethods(router);
+  const methods = Reflection.getMethods(router);
 
   Object.keys(methods).forEach(method => {
     Server[method] = router[method].bind(router);
@@ -45,8 +34,11 @@ module.exports = () => {
 };
 
 module.exports.Router = Router;
-module.exports.Route = Route;
-module.exports.Request = Request;
-module.exports.Response = Response;
-module.exports.Map = map;
+
+module.exports.Route = Router.RouteInterface;
+module.exports.Request = Router.RequestInterface;
+module.exports.Response = Router.ResponseInterface;
+
+module.exports.map = map;
+module.exports.methods = methods;
 module.exports.mime = mime;

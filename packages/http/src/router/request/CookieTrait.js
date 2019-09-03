@@ -1,5 +1,12 @@
 class CookieTrait {
   /**
+   * @var {Object} cookies
+   */
+  get cookies() {
+    return this.getCookie();
+  }
+
+  /**
    * Returns _COOKIE given name or all _COOKIE
    *
    * @param {String} [name = null]

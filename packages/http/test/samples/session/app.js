@@ -15,28 +15,18 @@ const session = require('express-session')({
 });
 
 //use cookie
-app.use((req, res) => {
-  //transform to async function
-  return new Promise(resolve => {
-    cookie(req, res, resolve);
-  });
-});
+app.use(cookie);
 
 //use session
-app.use((req, res) => {
-  //transform to async function
-  return new Promise(resolve => {
-    session(req, res, resolve)
-  });
-});
+app.use(session);
 
 app.on('request', (req, res) => {
   //load the session
   const incomingMessage = req.IncomingMessage;
   const session = Object.assign({}, incomingMessage.session);
   delete session.cookie;
-  req.setSession(session);
-  res.setSession(session);
+  req.set('session', session);
+  res.set('session', session);
 });
 
 app.on('response', (req, res) => {
