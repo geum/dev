@@ -1,26 +1,6 @@
 {
-  "name": "geum-test",
-  "version": "0.0.0",
-  "description": "Testing Geum",
-  "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
-  "license": "MIT",
-  "main": "src/app.js",
+  "private": true,
   "scripts": {
-    "test": "jest"
-  },
-  "dependencies": {
-    "geum": "0.0.1",
-    "cookie-parser": "^1.4.4",
-    "express-session": "^1.16.2",
-    "socket.io": "^2.2.0"
-  },
-  "devDependencies": {
-    "jest": "^24.8.0",
-    "nodemon": "^1.19.1"
-  },
-  "geum": {
-    "commands": [
-      "./events.js"
-    ]
+    "start": "node server.js"
   }
 }

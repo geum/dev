@@ -5,9 +5,21 @@ const { Definition, EventEmitter, Registry, Exception } = require('@geum/core');
 const Http = require('@geum/http');
 const Socket = require('@geum/socket');
 const React = require('@geum/react');
+const Browser = require('@geum/browser');
 const Terminal = require('./Terminal');
 
 class Application extends EventEmitter {
+  /**
+   * @var {Terminal} cli - Lazy loaded terminal interface
+   */
+  get cli() {
+    if (!this.services.cli) {
+      this.services.cli = Terminal.load();
+    }
+
+    return this.services.cli;
+  }
+
   /**
    * @var {String} pwd - Present Working Directory
    */
@@ -18,25 +30,12 @@ class Application extends EventEmitter {
   /**
    * @var {Http} server - Lazy loaded http server
    */
-  get react() {
-    if (!this.services.react) {
-      this.services.react = React();
-
-      //chain the errors
-      this.services.react.on('error', async(...args) => {
-        await this.emit('error', ...args);
-      });
-    }
-
-    return this.services.react;
-  }
-
-  /**
-   * @var {Http} server - Lazy loaded http server
-   */
   get server() {
     if (!this.services.server) {
       this.services.server = Http();
+
+      //attach react
+      this.services.server.use(React());
 
       //chain the errors
       this.services.server.on('error', async(...args) => {
@@ -64,14 +63,22 @@ class Application extends EventEmitter {
   }
 
   /**
-   * @var {Terminal} cli - Lazy loaded terminal interface
+   * @var {Browser} web - Lazy loaded browser tools
    */
-  get cli() {
-    if (!this.services.cli) {
-      this.services.cli = Terminal.load();
+  get web() {
+    if (!this.services.web) {
+      this.services.web = Browser();
+
+      //attach react
+      this.services.web.use(React());
+
+      //chain the errors
+      this.services.web.on('error', async(...args) => {
+        await this.emit('error', ...args);
+      });
     }
 
-    return this.services.cli;
+    return this.services.web;
   }
 
   /**

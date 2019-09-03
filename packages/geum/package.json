@@ -20,6 +20,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@geum/browser": "^0.0.20",
     "@geum/core": "^0.0.20",
     "@geum/http": "^0.0.20",
     "@geum/react": "^0.0.20",
