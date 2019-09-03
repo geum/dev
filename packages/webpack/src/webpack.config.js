@@ -1,11 +1,10 @@
-const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
   entry: {
     index: [
       'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
-      './client/index.js'
+      '<CUSTOM>'
     ]
   },
   mode: 'development',
@@ -13,7 +12,7 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /(node_modules|bower_components)/,
+        //exclude: /node_modules/,
         loader: 'babel-loader',
         options: { presets: ['@babel/env'] }
       },
@@ -25,7 +24,7 @@ module.exports = {
   },
   resolve: { extensions: ['*', '.js', '.jsx'] },
   output: {
-    path: path.resolve(__dirname, 'client/'),
+    path: '<CUSTOM>',
     publicPath: '/',
     filename: 'bundle.js'
   },

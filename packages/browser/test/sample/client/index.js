@@ -1,7 +1,7 @@
 require('@babel/polyfill');
 const { createBrowserHistory } = require('history');
 
-const browser = require('../../../../src');
+const browser = require('../../../src');
 const history = createBrowserHistory()
 const app = browser();
 

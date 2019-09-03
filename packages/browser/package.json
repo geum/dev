@@ -4,13 +4,13 @@
   "description": "Event driven React framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
-  "homepage": "https://github.com/geum/dev#readme",
+  "homepage": "https://github.com/geum/geum#readme",
   "bugs": {
-    "url": "https://github.com/geum/dev/issues"
+    "url": "https://github.com/geum/geum/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/geum/dev.git"
+    "url": "git+https://github.com/geum/geum.git"
   },
   "main": "src/index.js",
   "scripts": {
@@ -19,27 +19,18 @@
     "test": "jest"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/register": "^7.5.5",
     "@geum/core": "^0.0.21",
     "cookie": "^0.4.0",
-    "css-loader": "^3.2.0",
     "history": "^4.9.0",
-    "json-loader": "^0.5.7",
     "mime": "^2.4.4",
     "querystrings": "^0.4.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
     "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.5.5",
     "@geum/http": "^0.0.21",
-    "babel-loader": "^8.0.6",
+    "@geum/webpack": "^0.0.21",
     "jest": "^24.5.0",
-    "node-fetch": "^2.6.0",
-    "webpack": "^4.39.3",
-    "webpack-dev-middleware": "^3.7.0",
-    "webpack-hot-middleware": "^2.25.0"
+    "node-fetch": "^2.6.0"
   }
 }

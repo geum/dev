@@ -3,7 +3,7 @@ const { renderToString } = require('react-dom/server');
 const { createMemoryHistory } = require('history');
 
 const Page = require('./Page.jsx');
-const router = require('../client/router');
+const router = require('../client/router.jsx');
 
 const history = createMemoryHistory();
 

@@ -7,7 +7,7 @@ const { createBrowserHistory } = require('history');
 const browser = require('@geum/browser');
 
 const react = require('../../../../src');
-const router = require('./router');
+const router = require('./router.jsx');
 
 const history = createBrowserHistory();
 const app = browser();

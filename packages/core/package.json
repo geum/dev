@@ -4,13 +4,13 @@
   "description": "Event driven core framework",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
-  "homepage": "https://github.com/geum/dev#readme",
+  "homepage": "https://github.com/geum/geum#readme",
   "bugs": {
-    "url": "https://github.com/geum/dev/issues"
+    "url": "https://github.com/geum/geum/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/geum/dev.git"
+    "url": "git+https://github.com/geum/geum.git"
   },
   "main": "src/index.js",
   "scripts": {

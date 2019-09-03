@@ -1,21 +1,17 @@
+const path = require('path');
 const http = require('http');
+
 const geum = require('@geum/http');
-
-//see: https://medium.com/@binyamin/creating-a-node-express-webpack-app-with-dev-and-prod-builds-a4962ce51334
-const webpack = require('webpack');
-const webpackCfg = require('./webpack.config');
-const webpackDev = require('webpack-dev-middleware');
-const webpackHot = require('webpack-hot-middleware');
-const webpackCmp = webpack(webpackCfg);
-
 const app = geum();
 
-app.use(webpackDev(webpackCmp, {
-  noInfo: true,
-  publicPath: webpackCfg.output.publicPath
-}));
+const webpack = require('@geum/webpack');
 
-app.use(webpackHot(webpackCmp));
+const { dev, hot } = webpack(
+  './client/index.js',
+  path.join(__dirname, 'client/')
+);
+
+app.use(dev, hot);
 
 //make client public
 app.public(__dirname + '/client');

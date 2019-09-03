@@ -1,9 +1,14 @@
 require('@babel/register')({ presets: [ '@babel/preset-react' ] });
+const path = require('path');
 //main app
 const app = require('./http');
 
 //get middleware
-const { dev, hot } = require('./webpack');
+const { dev, hot } = require('@geum/webpack')(
+  './client/App.jsx',
+  path.resolve(__dirname, '../client/')
+);
+
 const router = require('./router');
 const react = require('../../../../src');
 

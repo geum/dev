@@ -1,4 +1,4 @@
-const { Router } = require('../../../../src');
+const { Router } = require('../../../src');
 const router = Router.load();
 
 const menu = [

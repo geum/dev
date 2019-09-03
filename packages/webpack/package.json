@@ -1,7 +1,7 @@
 {
-  "name": "@geum/react",
+  "name": "@geum/webpack",
   "version": "0.0.21",
-  "description": "Event driven React framework",
+  "description": "Webpack made easier",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
   "homepage": "https://github.com/geum/geum#readme",
@@ -19,21 +19,19 @@
     "test": "jest"
   },
   "dependencies": {
-    "@geum/browser": "^0.0.21",
-    "@geum/core": "^0.0.21",
-    "@geum/http": "^0.0.21",
-    "react": "^16.9.0"
-  },
-  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
-    "@geum/webpack": "^0.0.21",
-    "jest": "^24.5.0",
-    "node-fetch": "^2.6.0",
-    "react-dom": "^16.9.0",
-    "react-hot-loader": "^4.12.11",
-    "react-redux": "^4.4.1",
-    "redux": "^3.3.1"
+    "@babel/register": "^7.5.5",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.39.3",
+    "webpack-dev-middleware": "^3.7.0",
+    "webpack-hot-middleware": "^2.25.0"
+  },
+  "devDependencies": {
+    "@geum/http": "^0.0.21",
+    "jest": "^24.5.0"
   }
 }
