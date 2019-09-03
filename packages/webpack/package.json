@@ -1,6 +1,6 @@
 {
   "name": "@geum/webpack",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Webpack made easier",
   "author": "Christian Blanquera <cblanquera@sterlingtech.ph>",
   "license": "MIT",
@@ -31,7 +31,7 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "devDependencies": {
-    "@geum/http": "^0.0.21",
+    "@geum/http": "^0.0.22",
     "jest": "^24.5.0"
   }
 }
